@@ -11,7 +11,7 @@ namespace web.Data.Adapters
 {
     public static class ExpenditureAdapter
     {
-        public static IEnumerable<ExpenditureDto> GetExpenditure()
+        public static List<ExpenditureDto> GetExpenditure()
         {
             var result = new List<ExpenditureDto>();
 

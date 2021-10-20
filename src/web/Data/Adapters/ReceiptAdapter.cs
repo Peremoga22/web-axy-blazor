@@ -11,7 +11,7 @@ namespace web.Data.Adapters
 {
     public static class ReceiptAdapter
     {
-        public static IEnumerable<ReceiptDto> GetReceipt()
+        public static List<ReceiptDto> GetReceipt()
         {
             var result = new List<ReceiptDto>();
 

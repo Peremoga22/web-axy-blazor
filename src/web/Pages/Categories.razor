@@ -109,7 +109,7 @@
                                 <td><input class="form-control" type="text" @bind-value="modelReciept.Name" /></td>
                             </tr>
                             <tr class="form-group">
-                                <td>Date Time</td>
+                                <td>Sum</td>
                                 <td><input class="form-control" type="number" @bind-value="modelReciept.Sum" /></td>
                             </tr>
                         </table>
@@ -152,7 +152,7 @@
                                 <td><input class="form-control" type="text" @bind-value="modelExpenditure.Name" /></td>
                             </tr>
                             <tr class="form-group">
-                                <td>Date Time</td>
+                                <td>Sum</td>
                                 <td><input class="form-control" type="number" @bind-value="modelExpenditure.Sum" /></td>
                             </tr>
                         </table>
@@ -170,23 +170,33 @@
 
 
 @code{
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    List<CategoryDto> model = new List<CategoryDto>();
-    IEnumerable<ReceiptDto> receipts = new List<ReceiptDto>();
-    IEnumerable<ExpenditureDto> expenditures = new List<ExpenditureDto>();
+    List<CategoryDto> modelList = new List<CategoryDto>();
+    List<ReceiptDto> receipts = new List<ReceiptDto>();
+    List<ExpenditureDto> expenditures = new List<ExpenditureDto>();
     ReceiptDto modelReciept = new ReceiptDto();
     ExpenditureDto modelExpenditure = new ExpenditureDto();
-
+    CategoryDto model = new CategoryDto();
     string DeleteDisabled { get; set; } = null;
     string message;
     protected bool Collapsed = true;
     bool popupReceipt = false;
     bool popupExpenditure = false;
-
+    string userId;
     protected override async Task OnInitializedAsync()
     {
-        receipts = ReceiptAdapter.GetReceipt();
-        expenditures = ExpenditureAdapter.GetExpenditure();
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            receipts = ReceiptAdapter.GetReceipt();
+            expenditures = ExpenditureAdapter.GetExpenditure();
+        }
+
     }
 
     public void ShowPopupReciept(int id)
@@ -223,31 +233,65 @@
         receipt.Id = modelReciept.Id;
         receipt.Name = modelReciept.Name;
         receipt.Sum = modelReciept.Sum;
-        ReceiptAdapter.SaveReceipt(receipt);
+        var receiptId = ReceiptAdapter.SaveReceipt(receipt);
+
+        model.ExpenditureId = 0;
+        model.UserId = userId;
+        model.ReceiptId = receiptId;
+        model.NameCategory = receipt.Name;
+        CategoryAdapter.SaveCategory(model);
         popupReceipt = false;
-        receipts = ReceiptAdapter.GetReceipt();
+        receipts = new List<ReceiptDto>();
+        var listCategory = CategoryAdapter.GetCategory(userId).Where(z=>z.ReceiptId > 0).Select(z=>z.ReceiptId).ToList();
+        foreach(var item in listCategory)
+        {
+            var  receiptLists = ReceiptAdapter.GetReceipt().Where(z=>z.Id == item).ToList();
+            receipts.AddRange(receiptLists);
+        }
+
+
+
     }
 
     private void HandleValidSubmitPopupExpenditure()
     {
         var expenditure = new ExpenditureDto();
+
         expenditure.Id = modelExpenditure.Id;
         expenditure.Name = modelExpenditure.Name;
         expenditure.Sum = modelExpenditure.Sum;
-        ExpenditureAdapter.SaveExpenditure(expenditure);
+        var expenditureId = ExpenditureAdapter.SaveExpenditure(expenditure);
+
+        model.ReceiptId = 0;
+        model.UserId = userId;
+        model.ExpenditureId = expenditureId;
+        model.NameCategory = expenditure.Name;
+        CategoryAdapter.SaveCategory(model);
         popupExpenditure = false;
-        expenditures = ExpenditureAdapter.GetExpenditure();
+
+        expenditures = new List<ExpenditureDto>();
+        var listCategory = CategoryAdapter.GetCategory(userId).Where(z => z.ExpenditureId > 0).Select(z => z.ExpenditureId).ToList();
+        foreach (var item in listCategory)
+        {
+            var  expenditureList = ExpenditureAdapter.GetExpenditure().Where(z => z.Id == item).ToList();
+            expenditures.AddRange(expenditureList);
+        }
     }
 
     private void DeleteReceipt(int id)
     {
+        message = "";
         DeleteDisabled = "disabled";
+        var categoryCheck = CategoryAdapter.GetCategory(userId).Where(z=>z.ReceiptId == id).FirstOrDefault();
+        if(categoryCheck.IsCheckForDelete == false)
+        {
+            CategoryAdapter.Delete(categoryCheck.Id);
+        }
+
         try
         {
             ReceiptAdapter.DeleteReceipt(id);
             receipts = ReceiptAdapter.GetReceipt();
-            _jsRuntime.InvokeVoidAsync("loadScripts");
-
         }
         catch (Exception ex)
         {
@@ -259,12 +303,18 @@
 
     private void DeleteExpenditure(int id)
     {
+        message = "";
         DeleteDisabled = "disabled";
+        var categoryCheckExpenditure = CategoryAdapter.GetCategory(userId).Where(z => z.ExpenditureId == id).FirstOrDefault();
+        if (categoryCheckExpenditure.IsCheckForDelete == false)
+        {
+            CategoryAdapter.Delete(categoryCheckExpenditure.Id);
+        }
+
         try
         {
             ExpenditureAdapter.DeleteExpenditure(id);
             expenditures = ExpenditureAdapter.GetExpenditure();
-            _jsRuntime.InvokeVoidAsync("loadScripts");
         }
         catch (Exception ex)
         {

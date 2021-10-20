@@ -49,6 +49,10 @@
 
 
 @code{
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     CategoryDto model = new CategoryDto();
 
     List<SumBalans> sumBalans = new List<SumBalans>();
@@ -61,13 +65,23 @@
 
     decimal income = 0;
     decimal outcome = 0;
+    string userId;
     protected override async Task OnInitializedAsync()
     {
-        categoryList = CategoryAdapter.GetCategorySum();
-        var expenditureAll = categoryList.Select(z => z.SumExpenditure).FirstOrDefault();
-        var recieptAll = categoryList.Select(z => z.SumReceipt).FirstOrDefault();
-        income = recieptAll - expenditureAll;
-        sumCost = recieptAll;
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        model.CurrentDate = DateTime.Now;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            categoryList = CategoryAdapter.GetCategorySum();
+            var expenditureAll = categoryList.Select(z => z.SumExpenditure).FirstOrDefault();
+            var recieptAll = categoryList.Select(z => z.SumReceipt).FirstOrDefault();
+            income = recieptAll - expenditureAll;
+            sumCost = recieptAll;
+        }
+
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -97,7 +111,7 @@
 
     private async Task GeneratePieChartBlazorExpenditure()
     {
-        categoryList = CategoryAdapter.GetCategory();
+        categoryList = CategoryAdapter.GetCategory(userId);
         var categorySum = CategoryAdapter.GetCategorySum();
         var receiptSum = categorySum.Select(z => z.SumReceipt).FirstOrDefault();
         int count = 1;
@@ -123,7 +137,7 @@
 
     private async Task GeneratePieChartBlazorReceipt()
     {
-        categoryList = CategoryAdapter.GetCategory();
+        categoryList = CategoryAdapter.GetCategory(userId);
         int count = 1;
 
 

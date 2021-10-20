@@ -12,12 +12,13 @@ namespace web.Data.Adapters
 {
     public static class CategoryAdapter
     {
-        public static IEnumerable<CategoryDto> GetCategory()
+        public static IEnumerable<CategoryDto> GetCategory(string userId)
         {
             var result = new List<CategoryDto>();
 
             string sql = null;
-            sql = string.Format(@"exec [sp_GetCategory]");
+            sql = string.Format(@"exec [sp_GetCategory]  {0}",
+            DataBaseHelper.SafeSqlString(userId));
             var sqlResult = DataBaseHelper.GetSqlResult(sql);
           
             if (sqlResult.Rows.Count > 0)
@@ -36,8 +37,8 @@ namespace web.Data.Adapters
                         SumReceipt = DataBaseHelper.GetDecimalValueFromRowByName(item, "SumReceipt"),
                         ExpenditureId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ExpenditureId"),
                         NameExpenditure = DataBaseHelper.GetValueFromRowByName(item, "NameExpenditure"),
-                        SumExpenditure = DataBaseHelper.GetDecimalValueFromRowByName(item, "SumExpenditure")
-
+                        SumExpenditure = DataBaseHelper.GetDecimalValueFromRowByName(item, "SumExpenditure"),
+                        IsCheckForDelete = DataBaseHelper.GetBoolValueFromRowByName(item, "IsCheckForDelete")
                     });
                 }
             }
@@ -104,14 +105,16 @@ namespace web.Data.Adapters
                 var format = "yyyy-MM-dd HH:mm:ss:fff";
                 var stringDate = model.CurrentDate.ToString(format);
 
-                var sql = string.Format(@"EXEC [sp_SaveCategory] {0}, {1}, {2}, {3},{4},{5},{6}",
+                var sql = string.Format(@"EXEC [sp_SaveCategory] {0}, {1}, {2}, {3},{4},{5},{6},{7},{8}",
                 DataBaseHelper.RawSafeSqlString(model.Id),
                 DataBaseHelper.SafeSqlString(model.NameCategory),
                 DataBaseHelper.SafeSqlString(model.DescriptionCategory),
                 DataBaseHelper.SafeSqlString(stringDate),
                 DataBaseHelper.RawSafeSqlString(model.IsIncome),
                 DataBaseHelper.RawSafeSqlString(model.ExpenditureId),
-                DataBaseHelper.RawSafeSqlString(model.ReceiptId));
+                DataBaseHelper.RawSafeSqlString(model.ReceiptId),
+                DataBaseHelper.SafeSqlString(model.UserId),
+                DataBaseHelper.RawSafeSqlString(model.IsCheckForDelete));
 
                 var dataResult = DataBaseHelper.RunSql(sql);
             }
@@ -130,14 +133,16 @@ namespace web.Data.Adapters
                 var format = "yyyy-MM-dd HH:mm:ss:fff";
                 var stringDate = model.CurrentDate.ToString(format);
 
-                var sql = string.Format(@"EXEC [sp_SaveCategory] {0}, {1}, {2}, {3},{4},{5},{6}",
+                var sql = string.Format(@"EXEC [sp_SaveCategory] {0}, {1}, {2}, {3},{4},{5},{6},{7},{8}",
                 DataBaseHelper.RawSafeSqlString(model.Id),
                 DataBaseHelper.SafeSqlString(model.NameCategory),
                 DataBaseHelper.SafeSqlString(model.DescriptionCategory),
                 DataBaseHelper.SafeSqlString(stringDate),
                 DataBaseHelper.RawSafeSqlString(model.IsIncome),
                 DataBaseHelper.RawSafeSqlString(model.ExpenditureId),
-                DataBaseHelper.RawSafeSqlString(model.ReceiptId));
+                DataBaseHelper.RawSafeSqlString(model.ReceiptId),
+                DataBaseHelper.SafeSqlString(model.UserId),
+                DataBaseHelper.RawSafeSqlString(model.IsCheckForDelete));
 
                 var dataResult = DataBaseHelper.RunSql(sql);
             }
