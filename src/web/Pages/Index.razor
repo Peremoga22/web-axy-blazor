@@ -1,7 +1,191 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div class="text-center">
+    <div>
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome Axy</h1>
+            <EditForm Model="@model" OnValidSubmit="HandleValidSubmit" class="card-body">
+                <div class="form-group">
+                    <label>Date time</label>
+                    <input type="date" class="form-control" @bind-value="model.CurrentDate">
+                </div>
+                <div class="form-group">
+                    @if (!Approved)
+                    {
+                        <label for="formGroupExampleInput2">Sum</label>
+                        <InputNumber @bind-Value="model.SumReceipt" class="form-control" placeholder="Sum" />
+                    }
+                    else
+                    {
+                        <label for="formGroupExampleInput2">Sum</label>
+                        <InputNumber @bind-Value="model.SumExpenditure" class="form-control" placeholder="Sum" />
+                    }
+
+                </div>
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input" @onclick="IsReceiptsExpenditures" id="flexSwitchCheckChecked" unchecked />
+                    <label class="form-check-label" for="flexSwitchCheckChecked" name="Model.IsIncome">Income/Outcome </label>
+                </div>
+                <br /><br />
+                <label for="formGroupExampleInput">Category *<span style="color:red">@message</span></label><br />
+                <div class="input-group mb-3">
+                    @if (!Approved)
+                    {
+                        <InputSelect class="custom-select" @bind-Value="model.ReceiptId" @onclick="(() => Reset())">
+                            <option value="">Choose an option</option>
+                            @foreach (var r in receiptModel)
+                                {
+                                <option value="@r.Id">@r.Name</option>
+                                }
+                        </InputSelect>
+                    }
+                    else
+                    {
+
+                        <InputSelect class="custom-select" @bind-Value="model.ExpenditureId" @onclick="(() => Reset())">
+                            <option value="">Choose an option</option>
+                            @foreach (var e in expenditureModel)
+                                {
+                                <option value="@e.Id">@e.Name</option>
+                                }
+                        </InputSelect>
+                    }
+
+                    <div class="input-group-append">
+                        <label class="input-group-text" for="inputGroupSelect02">
+                            @*<i @onclick="(() => Edit())" style='font-size:14px' class='far'>&#xf044;</i>*@
+                            <img @onclick="(() => Edit())" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
+                        </label>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="formGroupExampleInput2">Description</label>
+                    <InputText id="title" @bind-Value="model.DescriptionCategory" class="form-control" placeholder="Add description" />
+                </div>
+                <br />
+                <button type="submit" class="btn btn-outline-warning ">Save</button>
+            </EditForm>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled text-left">
+                    <li>Current balans: @model.CurrentBalance</li>
+                    <li>Savings for this month: @model.SavingForThisMounth</li>
+                    <li>Balance at the beginning of the month: @model.BalanceTheBeginningMounth</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    CategoryDto model = new CategoryDto();
+    IEnumerable<ReceiptDto> receiptModel = new List<ReceiptDto>();
+    IEnumerable<ExpenditureDto> expenditureModel = new List<ExpenditureDto>();
+    public bool Approved = false;
+    string message;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        model.CurrentDate = DateTime.Now;
+        receiptModel = ReceiptAdapter.GetReceipt().ToList();
+        var getSum = CategoryAdapter.GetCategorySum();
+        var sumReceipt = getSum.Select(z => z.BalansRecipt).FirstOrDefault();
+        var sumExpenditure = getSum.Select(z => z.BalansExpenditure).FirstOrDefault();
+        model.CurrentBalance = sumReceipt - sumExpenditure;
+        model.SavingForThisMounth = sumReceipt - sumExpenditure;
+        model.BalanceTheBeginningMounth = sumReceipt;
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (model.ReceiptId == null && model.ExpenditureId == null)
+        {
+            message = "Please Choose an option!";
+        }
+        else
+        {
+            if (!Approved)
+            {
+                var receipt = new ReceiptDto();
+                model.NameCategory = receiptModel.Where(z => z.Id == model.ReceiptId).Select(z => z.Name).FirstOrDefault();
+                model.ExpenditureId = 0;
+                model.SumExpenditure = 0;
+                receipt.Id = 0;
+                receipt.Name = model.NameCategory;
+                receipt.Sum = model.SumReceipt;
+                int receiptId = ReceiptAdapter.SaveReceipt(receipt);
+
+                model.ReceiptId = receiptId;
+                CategoryAdapter.SaveCategory(model);
+            }
+            else
+            {
+                var expenditure = new ExpenditureDto();
+                model.NameCategory = expenditureModel.Where(z => z.Id == model.ExpenditureId).Select(z => z.Name).FirstOrDefault();
+                model.ReceiptId = 0;
+                model.SumReceipt = 0;
+                expenditure.Id = 0;
+                expenditure.Name = model.NameCategory;
+                expenditure.Sum = model.SumExpenditure;
+                int expenditureId = ExpenditureAdapter.SaveExpenditure(expenditure);
+
+                model.ExpenditureId = expenditureId;
+                CategoryAdapter.SaveCategory(model);
+            }
+
+
+            model = new CategoryDto();
+            model.CurrentDate = DateTime.Now;
+
+            var getSum = CategoryAdapter.GetCategorySum();
+            var sumReceipt = getSum.Select(z => z.SumReceipt).FirstOrDefault();
+            var sumExpenditure = getSum.Select(z => z.SumExpenditure).FirstOrDefault();
+            model.CurrentBalance = sumReceipt - sumExpenditure;
+            model.SavingForThisMounth = sumReceipt - sumExpenditure;
+
+            _jsRuntime.InvokeVoidAsync("loadScripts");
+        }
+    }
+
+    protected void Edit()
+    {
+        _navigationManager.NavigateTo("/categories/");
+    }
+
+
+    public void IsReceiptsExpenditures()
+    {
+        if (Approved)
+        {
+            receiptModel = ReceiptAdapter.GetReceipt().ToList();
+        }
+        else
+        {
+            expenditureModel = ExpenditureAdapter.GetExpenditure().ToList();
+        }
+
+        Approved = !Approved;
+        model.IsIncome = Approved;
+    }
+
+    public void Reset()
+    {
+        message = "";
+    }
+
+
+}
+
+

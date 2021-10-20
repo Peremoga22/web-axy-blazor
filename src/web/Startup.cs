@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 
 using web.Areas.Identity;
 using web.Data;
+using web.Extension;
 
 namespace web
 {
@@ -33,6 +34,7 @@ namespace web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            ConnectionString.Value = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));

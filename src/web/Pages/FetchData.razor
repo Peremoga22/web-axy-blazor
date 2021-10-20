@@ -1,46 +1,163 @@
-﻿@page "/fetchdata"
+﻿@page "/report"
+@using web.Data.Adapters;
+@inject IJSRuntime _jsRuntime;
+@using System.Timers
+@implements IDisposable
 
-@using web.Data
-@inject WeatherForecastService ForecastService
+<div>
 
-<h1>Weather forecast</h1>
+    <div class="jumbotron">
+        <div class="well span6" style="padding-top: 50px">
+            <h3 class="text-center">
+                Savings for this month: @income
+            </h3>
+        </div>
+        <div class="well span6" style="padding-top: 50px">
+            <h3 class="text-center">
+                Balans!
+            </h3>
+        </div>
+        @*<div class="well span6" style="padding-top: 50px">
+                <h3 class="text-center">
+                    <i class="fa fa-check-square-o" style="font-size:24px;color:green">@income</i>
+                    <i class="fa fa-check-square-o" style="font-size:24px;color:red">@outcome</i>
+                </h3>
+            </div>*@
 
-<p>This component demonstrates fetching data from a service.</p>
+        <div id="chartdiv"></div>
+        <br />
+        <div class="well span6" style="padding-top: 50px">
+            <h3 class="text-center">
+                Expenditure!
+            </h3>
+        </div>
+        <div id="chartdiv1"></div>
+        <br />
+        <div class="well span6" style="padding-top: 50px">
+            <h3 class="text-center">
+                Receipt!
+            </h3>
+        </div>
+        <div id="chartdiv2"></div>
+    </div>
+</div>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
 
-@code {
-    private WeatherForecast[] forecasts;
 
+@code{
+    CategoryDto model = new CategoryDto();
+
+    List<SumBalans> sumBalans = new List<SumBalans>();
+    List<SumExpenditure> sumExpenditures = new List<SumExpenditure>();
+    List<SumReceipt> sumReceipt = new List<SumReceipt>();
+
+
+    IEnumerable<CategoryDto> categoryList = new List<CategoryDto>();
+    private Timer timerObj = new(1000);
+
+    decimal income = 0;
+    decimal outcome = 0;
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        categoryList = CategoryAdapter.GetCategorySum();
+        var expenditureAll = categoryList.Select(z => z.BalansExpenditure).FirstOrDefault();
+        var recieptAll = categoryList.Select(z => z.BalansRecipt).FirstOrDefault();
+        income = recieptAll - expenditureAll;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+
+        GeneratePieChartBlazorBalans();
+        GeneratePieChartBlazorExpenditure();
+        GeneratePieChartBlazorReceipt();
+    }
+
+    private async Task GeneratePieChartBlazorBalans()
+    {
+        categoryList = CategoryAdapter.GetCategorySum();
+        var expenditureAll = categoryList.Select(z => z.BalansExpenditure).FirstOrDefault();
+        var recieptAll = categoryList.Select(z => z.BalansRecipt).FirstOrDefault();
+        var remainderSum = recieptAll - expenditureAll;
+        //income = recieptAll;
+        //outcome = expenditureAll;
+
+        sumBalans.Add(new SumBalans() { NameCategory = "Outcome", SumReceipt = recieptAll, SumExpenditure = remainderSum });
+        sumBalans.Add(new SumBalans() { NameCategory = " Income", SumReceipt = recieptAll, SumExpenditure = 0 });
+
+        //foreach (var item in categoryList)
+        //{
+        //    sumBalans.Add(new SumBalans() { NameCategory = item.DescriptionCategory, SumReceipt = item.BalansRecipt, SumExpenditure = item.SumExpenditure });
+
+        //    if (categoryList.Count() == count)
+        //    {
+        //        var remainderSum = item.BalansRecipt - item.BalansExpenditure;
+        //        sumBalans.Add(new SumBalans() { NameCategory = "Amount on the balance.", SumReceipt = item.BalansRecipt, SumExpenditure = remainderSum });
+        //        break;
+        //    }
+
+
+        //}
+
+        //sumBalans.Add(new SumBalans() { NameCategory = "Комунальні", SumReceipt = 2000, SumExpenditure = 100 });
+        //sumBalans.Add(new SumBalans() { NameCategory = "Харчування", SumReceipt = 2000, SumExpenditure = 300 });
+        //sumBalans.Add(new SumBalans() { NameCategory = "Відпочинок", SumReceipt = 2000, SumExpenditure = 500 });
+        //sumBalans.Add(new SumBalans() { NameCategory = "Cума на залишку", SumReceipt = 2000, SumExpenditure = 1100 });
+
+        await _jsRuntime.InvokeVoidAsync("GeneraPieChartBalans", sumBalans);
+    }
+
+    private async Task GeneratePieChartBlazorExpenditure()
+    {
+        categoryList = CategoryAdapter.GetCategory();
+        var categorySum = CategoryAdapter.GetCategorySum();
+        var receiptSum = categorySum.Select(z => z.BalansRecipt).FirstOrDefault();
+        int count = 1;
+
+
+        foreach (var item in categoryList.Where(z => z.SumExpenditure > 0).ToList())
+        {
+            sumExpenditures.Add(new SumExpenditure() { NameCategory = item.DescriptionCategory, SumReceipt = receiptSum, SumExpenditure = item.SumExpenditure });
+
+            //if (categoryList.Count() == count)
+            //{
+            //    var remainderSum = item.BalansRecipt - item.BalansExpenditure;
+            //    sumExpenditures.Add(new SumExpenditure() { NameCategory = "Amount on the balance.", SumReceipt = item.BalansRecipt, SumExpenditure = remainderSum });
+            //    break;
+            //}
+
+            count++;
+        }
+
+        await _jsRuntime.InvokeVoidAsync("GeneraPieChartExpenditure", sumExpenditures);
+    }
+
+
+    private async Task GeneratePieChartBlazorReceipt()
+    {
+        categoryList = CategoryAdapter.GetCategory();
+        int count = 1;
+
+
+        foreach (var item in categoryList.Where(z => z.SumReceipt > 0).ToList())
+        {
+            sumReceipt.Add(new SumReceipt() { NameCategory = item.DescriptionCategory, SumReceipt = item.SumReceipt, SumExpenditure = 0 });
+
+            //if (categoryList.Count() == count)
+            //{
+            //    var remainderSum = item.BalansRecipt - item.BalansExpenditure;
+            //    sumList.Add(new SumPieDto() { NameCategory = "Amount on the balance.", SumReceipt = item.BalansRecipt, SumExpenditure = remainderSum });
+            //    break;
+            //}
+
+            count++;
+        }
+
+        await _jsRuntime.InvokeVoidAsync("GeneraPieChartReceipt", sumReceipt);
+    }
+
+    public void Dispose()
+    {
+        timerObj?.Dispose();
     }
 }
