@@ -76,10 +76,10 @@
         {
             userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
             categoryList = CategoryAdapter.GetCategorySum();
-            var expenditureAll = categoryList.Select(z => z.SumExpenditure).FirstOrDefault();
-            var recieptAll = categoryList.Select(z => z.SumReceipt).FirstOrDefault();
+            var expenditureAll = categoryList.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
+            var recieptAll = categoryList.Where(z => z.UserId == userId).Select(z => z.SumReceipt).FirstOrDefault();
             income = recieptAll - expenditureAll;
-            sumCost = recieptAll;
+            sumCost = expenditureAll;
         }
 
     }
@@ -95,8 +95,8 @@
     private async Task GeneratePieChartBlazorBalans()
     {
         categoryList = CategoryAdapter.GetCategorySum();
-        var expenditureAll = categoryList.Select(z => z.SumExpenditure).FirstOrDefault();
-        var recieptAll = categoryList.Select(z => z.SumReceipt).FirstOrDefault();
+        var expenditureAll = categoryList.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
+        var recieptAll = categoryList.Where(z => z.UserId == userId).Select(z => z.SumReceipt).FirstOrDefault();
         var remainderSum = recieptAll - expenditureAll;
         //income = recieptAll;
         //outcome = expenditureAll;
@@ -113,22 +113,13 @@
     {
         categoryList = CategoryAdapter.GetCategory(userId);
         var categorySum = CategoryAdapter.GetCategorySum();
-        var receiptSum = categorySum.Select(z => z.SumReceipt).FirstOrDefault();
-        int count = 1;
+        var receiptSum = categorySum.Where(z => z.UserId == userId).Select(z => z.SumReceipt).FirstOrDefault();
 
-
-        foreach (var item in categoryList.Where(z => z.SumExpenditure > 0).ToList())
+        foreach (var item in categoryList.Where(z=>z.ExpenditureId>0).ToList())
         {
-            sumExpenditures.Add(new SumExpenditure() { NameCategory = item.DescriptionCategory, SumReceipt = receiptSum, SumExpenditure = item.SumExpenditure });
+            sumExpenditures.Add(new SumExpenditure() { NameCategory = item.NameExpenditure, SumReceipt = receiptSum, SumExpenditure = item.SumExpenditure });
+           
 
-            //if (categoryList.Count() == count)
-            //{
-            //    var remainderSum = item.BalansRecipt - item.BalansExpenditure;
-            //    sumExpenditures.Add(new SumExpenditure() { NameCategory = "Amount on the balance.", SumReceipt = item.BalansRecipt, SumExpenditure = remainderSum });
-            //    break;
-            //}
-
-            count++;
         }
 
         await _jsRuntime.InvokeVoidAsync("GeneralPieChartExpenditure", sumExpenditures);

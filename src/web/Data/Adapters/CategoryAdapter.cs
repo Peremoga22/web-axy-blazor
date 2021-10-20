@@ -210,7 +210,8 @@ namespace web.Data.Adapters
                         SumReceipt = DataBaseHelper.GetDecimalValueFromRowByName(item, "SumReceipt"),
                         SumExpenditure = DataBaseHelper.GetDecimalValueFromRowByName(item, "SumExpenditure"),
                         BalansRecipt = DataBaseHelper.GetDecimalValueFromRowByName(item, "BalansRecipt"),
-                        BalansExpenditure = DataBaseHelper.GetDecimalValueFromRowByName(item, "BalansExpenditure")
+                        BalansExpenditure = DataBaseHelper.GetDecimalValueFromRowByName(item, "BalansExpenditure"),
+                        UserId = DataBaseHelper.GetValueFromRowByName(item, "UserId")
                     });
                 }
             }
