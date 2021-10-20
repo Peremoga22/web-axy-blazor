@@ -1,6 +1,6 @@
-USE [axy-blazor]
+USE [axy-blazor2]
 GO
-/****** Object:  StoredProcedure  ******/
+/****** Object:  StoredProcedure [dbo].[sp_SaveReceipt]    Script Date: 21.10.2021 2:14:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -43,10 +43,3 @@ BEGIN
 	END	
 	
 END
-
- 
-
-  
-
-
-	

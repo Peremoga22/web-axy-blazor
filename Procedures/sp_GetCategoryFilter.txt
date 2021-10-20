@@ -1,6 +1,6 @@
-USE [axy-blazor]
+USE [axy-blazor2]
 GO
-/****** Object:  ******/
+/****** Object:  StoredProcedure [dbo].[sp_GetCategoryFilter]    Script Date: 21.10.2021 2:07:30 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -13,7 +13,7 @@ GO
 Create procedure [dbo].[sp_GetCategoryFilter] 
 	@StartDate datetime2,
 	@EndDate datetime2,
-	@IsCome bit 
+	@IsCome bit
 AS
 BEGIN
 	
@@ -39,13 +39,3 @@ BEGIN
 	END 
 	
 END
-
-
-
-
-
-
-
-
-
-	

@@ -1,6 +1,6 @@
-USE [axy]
+USE [axy-blazor2]
 GO
-
+/****** Object:  StoredProcedure [dbo].[sp_SaveCategory]    Script Date: 21.10.2021 2:12:59 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,7 +17,9 @@ Create procedure [dbo].[sp_SaveCategory]
 		@CurrentDate  datetime2,
 		@IsIncome bit,
 		@ExpenditureId int,
-		@ReceiptId int
+		@ReceiptId int,
+		@UserId nvarchar(max),
+		@IsCheckForDelete bit
 AS
 BEGIN	
 	--SET NOCOUNT ON;
@@ -33,7 +35,9 @@ BEGIN
 		CurentData = @CurrentDate,
 		IsIncome =@IsIncome,
 		ExpenditureId = @ExpenditureId,
-		ReceiptId =@ReceiptId
+		ReceiptId =@ReceiptId,
+		UserId = @UserId,
+		IsCheckForDelete = @IsCheckForDelete
 		WHERE CategoryId =@Id
  	end
 	else
@@ -45,7 +49,9 @@ BEGIN
 			  CurentData,
 			  IsIncome,
 			  ExpenditureId,
-			  ReceiptId
+			  ReceiptId,
+			  UserId,
+			  IsCheckForDelete
 		  )
 		  Values
 		  (			 
@@ -54,14 +60,10 @@ BEGIN
 			  @CurrentDate,
 			  @IsIncome,
 			  @ExpenditureId,
-			  @ReceiptId		 
+			  @ReceiptId,
+			  @UserId,
+			  @IsCheckForDelete		 
 		  )		 
 	END	
 	
 END
-
- 
-
-
-
-
