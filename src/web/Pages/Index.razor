@@ -3,7 +3,9 @@
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
 
-
+<div class="alert alert-primary" role="alert">
+    <p class="text-right"style="color:blue;"> Costs: @sumCost</p>
+</div>
 <div class="text-center">
     <div>
         <div class="jumbotron">
@@ -75,7 +77,7 @@
         <div class="card">
             <div class="card-body">
                 <ul class="list-unstyled text-left">
-                    <li>Current balans: @model.CurrentBalance</li>
+                    <li>Current balance: @model.CurrentBalance</li>
                     <li>Savings for this month: @model.SavingForThisMounth</li>
                     <li>Balance at the beginning of the month: @model.BalanceTheBeginningMounth</li>
                 </ul>
@@ -83,6 +85,7 @@
         </div>
     </div>
 </div>
+
 
 
 @code{
@@ -94,18 +97,19 @@
     IEnumerable<ExpenditureDto> expenditureModel = new List<ExpenditureDto>();
     public bool Approved = false;
     string message;
-
+    decimal sumCost;
 
     protected override async Task OnInitializedAsync()
     {
         model.CurrentDate = DateTime.Now;
         receiptModel = ReceiptAdapter.GetReceipt().ToList();
         var getSum = CategoryAdapter.GetCategorySum();
-        var sumReceipt = getSum.Select(z => z.BalansRecipt).FirstOrDefault();
-        var sumExpenditure = getSum.Select(z => z.BalansExpenditure).FirstOrDefault();
+        var sumReceipt = getSum.Select(z => z.SumReceipt).FirstOrDefault();
+        var sumExpenditure = getSum.Select(z => z.SumExpenditure).FirstOrDefault();
         model.CurrentBalance = sumReceipt - sumExpenditure;
         model.SavingForThisMounth = sumReceipt - sumExpenditure;
         model.BalanceTheBeginningMounth = sumReceipt;
+        sumCost = sumExpenditure;
     }
 
     private void HandleValidSubmit()
@@ -122,12 +126,12 @@
                 model.NameCategory = receiptModel.Where(z => z.Id == model.ReceiptId).Select(z => z.Name).FirstOrDefault();
                 model.ExpenditureId = 0;
                 model.SumExpenditure = 0;
-                receipt.Id = 0;
+                receipt.Id = receiptModel.Where(z => z.Id == model.ReceiptId).Select(z => z.Id).FirstOrDefault();
                 receipt.Name = model.NameCategory;
                 receipt.Sum = model.SumReceipt;
-                int receiptId = ReceiptAdapter.SaveReceipt(receipt);
+                ReceiptAdapter.SaveReceipt(receipt);
 
-                model.ReceiptId = receiptId;
+                model.ReceiptId = receipt.Id;
                 CategoryAdapter.SaveCategory(model);
             }
             else
@@ -136,12 +140,12 @@
                 model.NameCategory = expenditureModel.Where(z => z.Id == model.ExpenditureId).Select(z => z.Name).FirstOrDefault();
                 model.ReceiptId = 0;
                 model.SumReceipt = 0;
-                expenditure.Id = 0;
+                expenditure.Id = expenditureModel.Where(z => z.Id == model.ExpenditureId).Select(z => z.Id).FirstOrDefault();
                 expenditure.Name = model.NameCategory;
                 expenditure.Sum = model.SumExpenditure;
-                int expenditureId = ExpenditureAdapter.SaveExpenditure(expenditure);
+                ExpenditureAdapter.SaveExpenditure(expenditure);
 
-                model.ExpenditureId = expenditureId;
+                model.ExpenditureId = expenditure.Id;
                 CategoryAdapter.SaveCategory(model);
             }
 

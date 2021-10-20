@@ -1,4 +1,4 @@
-﻿function GeneraPieChartBalans(sumBalans) {
+﻿function GeneralPieChartBalans(sumBalans) {
     am4core.useTheme(am4themes_animated);
 
     var chart = am4core.create("chartdiv", am4charts.PieChart3D);
@@ -15,7 +15,7 @@
     series.dataFields.category = "nameCategory";    
 }
 
-function GeneraPieChartExpenditure(sumList) {
+function GeneralPieChartExpenditure(sumList) {
     am4core.useTheme(am4themes_animated);
 
     var chart = am4core.create("chartdiv1", am4charts.PieChart3D);
@@ -32,7 +32,7 @@ function GeneraPieChartExpenditure(sumList) {
     series.dataFields.category = "nameCategory";
 }
 
-function GeneraPieChartReceipt(sumList) {
+function GeneralPieChartReceipt(sumList) {
     am4core.useTheme(am4themes_animated);
 
     var chart = am4core.create("chartdiv2", am4charts.PieChart3D);

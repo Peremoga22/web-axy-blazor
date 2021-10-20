@@ -1,0 +1,30 @@
+USE [axy]
+GO
+/****** Object:  StoredProcedure ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		
+-- Create date: 
+-- Description:
+-- =============================================
+Create procedure [dbo].[sp_RemoveReceipt] 
+		@Id int		
+AS
+BEGIN	
+	SET NOCOUNT ON;	
+    BEGIN 	
+		 Delete from Receipts
+		 where ReceiptId = @Id 
+	END	
+	
+END
+
+ 
+
+
+
+
+	

@@ -1,0 +1,54 @@
+USE [axy-blazor]
+GO
+/****** Object:  StoredProcedure  ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		
+-- Create date: 
+-- Description:
+-- =============================================
+Create procedure [dbo].[sp_SaveExpenditure] 
+		@Id int,
+		@Name nvarchar(25),
+		@Sum decimal(18,2)
+AS
+BEGIN	
+	SET NOCOUNT ON;
+	SET IDENTITY_INSERT Expenditures Off
+	SET @Sum = CAST(CAST(ISNULL(@Sum, 0) as decimal(16,3)) AS decimal(16,3))
+	if(@Id > 0)
+	begin
+		Update Expenditures
+		SET 
+		Name =@Name,
+		Sum = @Sum
+		WHERE ExpenditureId =@Id
+ 	end
+	else
+    BEGIN 	
+		  INSERT Expenditures
+		  (
+			  Name,
+			  Sum
+		  )
+		  Values
+		  (			 
+			  @Name,
+			  @Sum			 
+		  )	
+             Select SCOPE_IDENTITY() As ExpenditureId	 	 
+	END	
+	
+END
+
+ 
+
+
+
+
+
+
+	

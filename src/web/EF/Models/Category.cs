@@ -14,7 +14,7 @@ namespace web.EF.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime CurentData { get; set; }
-
+        public string UserId { get; set; }
         public bool IsIncome { get; set; }
         [ForeignKey("ReceiptId")]
         public virtual Receipt Receipts { get; set; }

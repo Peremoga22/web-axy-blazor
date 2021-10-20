@@ -4,8 +4,15 @@
 @*@bind-value="model.CurrentDate"*@
 
 
-<i class="fa fa-bar-chart" style="font-size:36px" @onclick="Collaps"></i>
 
+<div class="alert alert-primary" role="alert"@onclick="Collaps">
+    <p class="text-right" style="color:blue;">
+        Costs: @sumCost
+        <i class="fa fa-bar-chart text-left p-2" style="font-size:36px; text-align:left;"></i>
+        @*Costs: @sumCost*@
+    </p>
+   
+</div>
 <div class="@(Collapsed? "collapse": "" )">
 
     <EditForm Model="@model" OnValidSubmit="HandleValidSubmit" class="body  p-3 mb-5 rounded ">
@@ -78,7 +85,9 @@
                         @*<i style='font-size:14px' @onclick="(() => Edit(item.Id))" class='far fa-edit'></i>*@
                         <img @onclick="(() => ShowPopup(item.Id))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
                     </button>
-
+                    <button class="btn btn-sm btn-outline-danger">
+                        <img @onclick="(() => Delete(item.Id))" disabled="@DeleteDisabled" src="https://img.icons8.com/ios/21/000000/delete-forever--v1.png" />
+                    </button>
                 </td>
             </tr>
         }
@@ -146,12 +155,16 @@
     CategoryDto model = new CategoryDto();
     protected bool Collapsed = true;
     bool popup = false;
+    decimal sumCost;
+    string DeleteDisabled { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
         modelList = CategoryAdapter.GetCategory();
         model.StartDate = DateTime.Now;
         model.EndDate = DateTime.Now;
+        var getSum = CategoryAdapter.GetCategorySum();
+        sumCost = getSum.Select(z => z.SumExpenditure).FirstOrDefault();
     }
 
     public void ShowPopup(int id)
@@ -224,5 +237,15 @@
     public void ResetSearch()
     {
         modelList = CategoryAdapter.GetCategory();
+    }
+
+    public void Delete(int id)
+    {
+        DeleteDisabled = "disabled";
+        CategoryAdapter.Delete(id);
+        modelList = CategoryAdapter.GetCategory();
+        model.StartDate = DateTime.Now;
+        model.EndDate = DateTime.Now;
+        DeleteDisabled = null;
     }
 }
