@@ -208,7 +208,7 @@
                 expenditures.AddRange(receiptTemp);
             }
 
-            
+
         }
 
     }
@@ -249,11 +249,15 @@
         receipt.Sum = modelReciept.Sum;
         var receiptId = ReceiptAdapter.SaveReceipt(receipt);
 
-        model.ExpenditureId = 0;
-        model.UserId = userId;
-        model.ReceiptId = receiptId;
-        model.NameCategory = receipt.Name;
-        CategoryAdapter.SaveCategory(model);
+        if(receiptId > 0)
+        {
+            model.ExpenditureId = 0;
+            model.UserId = userId;
+            model.ReceiptId = receiptId;
+            model.NameCategory = receipt.Name;
+            CategoryAdapter.SaveCategory(model);
+        }
+
         popupReceipt = false;
         receipts = new List<ReceiptDto>();
         var listCategory = CategoryAdapter.GetCategory(userId).Where(z=>z.ReceiptId > 0).Select(z=>z.ReceiptId).ToList();
@@ -262,9 +266,6 @@
             var  receiptLists = ReceiptAdapter.GetReceipt().Where(z=>z.Id == item).ToList();
             receipts.AddRange(receiptLists);
         }
-
-
-
     }
 
     private void HandleValidSubmitPopupExpenditure()
@@ -276,11 +277,15 @@
         expenditure.Sum = modelExpenditure.Sum;
         var expenditureId = ExpenditureAdapter.SaveExpenditure(expenditure);
 
-        model.ReceiptId = 0;
-        model.UserId = userId;
-        model.ExpenditureId = expenditureId;
-        model.NameCategory = expenditure.Name;
-        CategoryAdapter.SaveCategory(model);
+        if(expenditureId > 0)
+        {
+            model.ReceiptId = 0;
+            model.UserId = userId;
+            model.ExpenditureId = expenditureId;
+            model.NameCategory = expenditure.Name;
+            CategoryAdapter.SaveCategory(model);
+        }
+
         popupExpenditure = false;
 
         expenditures = new List<ExpenditureDto>();

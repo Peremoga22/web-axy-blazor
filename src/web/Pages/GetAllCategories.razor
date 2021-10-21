@@ -30,12 +30,15 @@
                     <input type="date" class="form-control" @bind-value="model.EndDate" />
                 </div>
             </div>
-            <div class="row d-flex m-2">
-                <div class="form-check form-switch">
-                    <div class="col-lg-12 form-group">
-                        <input type="checkbox" class="form-check-input" @onclick="IsReceiptsExpenditures" @bind-value="model.IsIncome" id="flexSwitchCheckChecked" unchecked />
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Income/Outcome </label>
-                    </div>
+            <div class="row d-flex">
+                <div class="col-lg-12 form-group">
+                    <label for="additional">Choose an option:</label>
+                    <InputSelect @bind-Value="model.Filter" class="form-control">                       
+                        @foreach (var item in Enum.GetValues(typeof(Filter)))
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </InputSelect>
                 </div>
             </div>
         </div>
@@ -122,7 +125,7 @@
                                     <td><input class="form-control" type="number" @bind-value="model.SumExpenditure" /></td>
                                 </tr>
                             }
-
+                           
                             <tr class="form-group">
                                 <td>Name</td>
                                 <td><input class="form-control" type="text" @bind-value="model.NameCategory" /></td>
@@ -204,7 +207,27 @@
 
     private void HandleValidSubmit()
     {
-        modelList = CategoryAdapter.GetCategoryList(model);
+        if(model.Filter == "GetAll" || string.IsNullOrEmpty(model.Filter))
+        {
+            model.Filter = "GetAll";
+            modelList = CategoryAdapter.GetCategory(userId);
+        }
+        else
+        {
+            switch (model.Filter)
+            {
+                case "Income":
+                    model.IsIncome = false;
+                    break;
+                case "OutCome":
+                    model.IsIncome = true;
+                    break;
+            }
+
+            modelList = CategoryAdapter.GetCategoryList(model);
+        }
+
+
         model.StartDate = DateTime.Now;
         model.EndDate = DateTime.Now;
         Collapsed = true;
@@ -229,6 +252,8 @@
             ReceiptAdapter.SaveReceipt(receipt);
         }
 
+        model.UserId = userId;
+        model.IsCheckForDelete = true;
         CategoryAdapter.SaveCategory(model);
         popup = false;
         modelList = CategoryAdapter.GetCategory(userId);
@@ -273,5 +298,12 @@
         model.StartDate = DateTime.Now;
         model.EndDate = DateTime.Now;
         DeleteDisabled = null;
+    }
+
+    public enum Filter
+    {
+        GetAll,
+        Income,
+        OutCome
     }
 }
