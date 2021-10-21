@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using web.Areas.Identity;
 using web.Data;
 using web.Extension;
+using web.Services.Email;
 
 namespace web
 {
@@ -45,7 +46,7 @@ namespace web
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
-            services.AddAuthentication()
+            services.AddAuthentication().AddCookie()
                .AddFacebook(facebookOptions => {
                    facebookOptions.ClientId = Configuration["Authentication:Facebook:ClientId"];
                    facebookOptions.ClientSecret = Configuration["Authentication:Facebook:ClientSecret"];
@@ -54,6 +55,8 @@ namespace web
                    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
                    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
                });
+
+            services.AddTransient<IEmailService, EmailClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
