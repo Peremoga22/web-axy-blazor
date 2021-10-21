@@ -193,8 +193,22 @@
         if (user.Identity.IsAuthenticated)
         {
             userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
-            receipts = ReceiptAdapter.GetReceipt();
-            expenditures = ExpenditureAdapter.GetExpenditure();
+
+            var listCategory = CategoryAdapter.GetCategory(userId).Where(z => z.ReceiptId > 0).Select(z => z.ReceiptId).ToList();
+            foreach (var item in listCategory)
+            {
+                var receiptTemp = ReceiptAdapter.GetReceipt().Where(z => z.Id == item).ToList();
+                receipts.AddRange(receiptTemp);
+            }
+
+            var listCategoryExpenditure = CategoryAdapter.GetCategory(userId).Where(z => z.ExpenditureId > 0).Select(z => z.ExpenditureId).ToList();
+            foreach (var item in listCategoryExpenditure)
+            {
+                var receiptTemp = ExpenditureAdapter.GetExpenditure().Where(z => z.Id == item).ToList();
+                expenditures.AddRange(receiptTemp);
+            }
+
+            
         }
 
     }

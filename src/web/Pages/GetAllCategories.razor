@@ -254,8 +254,22 @@
     public void Delete(int id)
     {
         DeleteDisabled = "disabled";
+        var checkIdExpenditure = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z=>z.ExpenditureId).FirstOrDefault();
+        var checkIdReciept = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ReceiptId).FirstOrDefault();
+
         CategoryAdapter.Delete(id);
-        modelList = CategoryAdapter.GetCategory(userId);
+
+        if(checkIdExpenditure > 0)
+        {
+            ExpenditureAdapter.DeleteExpenditure((int)checkIdExpenditure);
+        }
+
+        if (checkIdReciept > 0)
+        {
+            ReceiptAdapter.DeleteReceipt((int)checkIdReciept);
+        }
+
+        modelList = CategoryAdapter.GetCategory(userId).Where(z=>z.IsCheckForDelete == true).ToList();
         model.StartDate = DateTime.Now;
         model.EndDate = DateTime.Now;
         DeleteDisabled = null;
