@@ -2,7 +2,9 @@
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
 
-
+<div class="alert alert-primary" role="alert">
+    <p class="text-right" style="color:blue;"> Costs: @sumCost </p>
+</div>
 <div class="text-center">
     <div>
         <div >
@@ -185,6 +187,8 @@
     bool popupReceipt = false;
     bool popupExpenditure = false;
     string userId;
+    decimal sumCost;
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationStateTask;
@@ -208,7 +212,18 @@
                 expenditures.AddRange(receiptTemp);
             }
 
+            var getSum = CategoryAdapter.GetCategorySum();
+            var takeSum = getSum.Where(z => z.UserId == userId).FirstOrDefault();
+            var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
 
+            if (takeSum != null)
+            {
+                model.CurrentBalance = takeSum.SumReceipt - sumExpenditure;
+                model.SavingForThisMounth = takeSum.SumReceipt - sumExpenditure;
+                model.BalanceTheBeginningMounth = takeSum.SumReceipt;
+                sumCost = sumExpenditure;
+
+            }
         }
 
     }
