@@ -176,8 +176,17 @@
             modelList = CategoryAdapter.GetCategory(userId).Where(z=>!string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
             model.StartDate = DateTime.Now;
             model.EndDate = DateTime.Now;
+
             var getSum = CategoryAdapter.GetCategorySum();
-            sumCost = getSum.Select(z => z.SumExpenditure).FirstOrDefault();
+            var takeSum = getSum.Where(z => z.UserId == userId).FirstOrDefault();
+            var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
+            if (takeSum != null)
+            {
+                model.CurrentBalance = takeSum.SumReceipt - sumExpenditure;
+                model.SavingForThisMounth = takeSum.SumReceipt - sumExpenditure;
+                model.BalanceTheBeginningMounth = takeSum.SumReceipt;
+                sumCost = sumExpenditure;
+            }
         }
 
     }

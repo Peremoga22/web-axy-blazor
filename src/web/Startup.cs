@@ -45,6 +45,15 @@ namespace web
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+            services.AddAuthentication()
+               .AddFacebook(facebookOptions => {
+                   facebookOptions.ClientId = Configuration["Authentication:Facebook:ClientId"];
+                   facebookOptions.ClientSecret = Configuration["Authentication:Facebook:ClientSecret"];
+               })
+               .AddGoogle(googleOptions => {
+                   googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                   googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+               });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
