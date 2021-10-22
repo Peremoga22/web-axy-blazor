@@ -192,9 +192,10 @@ namespace web.Data.Adapters
         public static IEnumerable<CategoryDto> GetCategorySum()
         {
             var result = new List<CategoryDto>();
-
+            var  isShow = true;
             string sql = null;
-            sql = string.Format(@"exec [sp_GetCategorySum]");
+            sql = string.Format(@"exec [sp_GetCategorySum] {0}",
+               DataBaseHelper.SafeSqlString(isShow));
             var sqlResult = DataBaseHelper.GetSqlResult(sql);
 
             if (sqlResult.Rows.Count > 0)

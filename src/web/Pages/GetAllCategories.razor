@@ -250,7 +250,11 @@
             expenditure.Id = (int)model.ExpenditureId;
             expenditure.Name = model.NameCategory;
             expenditure.Sum = model.SumExpenditure;
-            ExpenditureAdapter.SaveExpenditure(expenditure);
+            var expenditureId =  ExpenditureAdapter.SaveExpenditure(expenditure);
+
+            model.UserId = userId;
+            model.IsCheckForDelete = true;
+            CategoryAdapter.SaveCategory(model);
         }
         else
         {
@@ -258,12 +262,14 @@
             receipt.Id = (int)model.ReceiptId;
             receipt.Name = model.NameCategory;
             receipt.Sum = model.SumReceipt;
-            ReceiptAdapter.SaveReceipt(receipt);
+            var receiptId = ReceiptAdapter.SaveReceipt(receipt);
+
+
+            model.UserId = userId;
+            model.IsCheckForDelete = true;
+            CategoryAdapter.SaveCategory(model);
         }
 
-        model.UserId = userId;
-        model.IsCheckForDelete = true;
-        CategoryAdapter.SaveCategory(model);
         popup = false;
         modelList = CategoryAdapter.GetCategory(userId);
     }

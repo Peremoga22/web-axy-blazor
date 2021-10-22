@@ -190,9 +190,10 @@
             var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
             model.CurrentBalance = sumReceipt - sumExpenditure;
             model.SavingForThisMounth = sumReceipt - sumExpenditure;
+            model.BalanceTheBeginningMounth = sumReceipt;
 
             // _jsRuntime.InvokeVoidAsync("loadScripts");
-        }
+            }
     }
 
     protected void Edit()

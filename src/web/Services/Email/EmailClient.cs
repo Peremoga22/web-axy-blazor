@@ -16,13 +16,13 @@ namespace web.Services.Email
     }
     public class EmailClient : IEmailService
     {
-        private readonly string Email = "dev.test001@outlook.com";
-        private readonly string Password = "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";
-      
+        private readonly string Email;
+        private readonly string Password;
+       
         public EmailClient(IConfiguration configuration)
-        {
-            //Email = configuration.GetValue<string>("EmailConf:Email");
-           // Password = configuration.GetValue<string>("EmailConf:Pass");
+        {            
+             Email = configuration.GetValue<string>("EmailConf:Email");
+             Password = configuration.GetValue<string>("EmailConf:Pass");
         }
 
         public async void Send(string EmailTo, string emailLink, string pass, string html)
