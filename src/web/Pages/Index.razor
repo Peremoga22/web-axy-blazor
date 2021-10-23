@@ -135,6 +135,10 @@
             }
 
         }
+        else
+        {
+            _navigationManager.NavigateTo("./Identity/Account/Login");
+        }
 
     }
 
@@ -165,19 +169,21 @@
             }
             else
             {
-                var expenditure = new ExpenditureDto();
+                var expenditure = new ExpenditureCategoryDto();
                 model.NameCategory = expenditureModel.Where(z => z.Id == model.ExpenditureId).Select(z => z.Name).FirstOrDefault();
                 model.ReceiptId = 0;
                 model.SumReceipt = 0;
-                expenditure.Id = expenditureModel.Where(z => z.Id == model.ExpenditureId).Select(z => z.Id).FirstOrDefault();
-                expenditure.Name = model.NameCategory;
-                expenditure.Sum = model.SumExpenditure;
-                ExpenditureAdapter.SaveExpenditure(expenditure);
+                expenditure.ExpenditureId = expenditureModel.Where(z => z.Id == model.ExpenditureId).Select(z => z.Id).FirstOrDefault();
+                expenditure.CategoryName = model.NameCategory;
+                expenditure.CurrentSum = model.SumExpenditure;
+                expenditure.Description = model.DescriptionCategory;
+                expenditure.IsShowUp = true;
+                ExpenditureCategoryAdapter.SaveExpenditureCategory(expenditure);
 
                 model.Id = CategoryAdapter.GetCategory(userId).Where(z => z.ExpenditureId == model.ExpenditureId).Select(z => z.Id).FirstOrDefault();
                 model.IsCheckForDelete = true;
                 model.UserId = userId;
-                model.ExpenditureId = expenditure.Id;
+                model.ExpenditureId = expenditure.ExpenditureId;
                 CategoryAdapter.SaveCategory(model);
             }
 
@@ -193,7 +199,7 @@
             model.BalanceTheBeginningMounth = sumReceipt;
 
             // _jsRuntime.InvokeVoidAsync("loadScripts");
-            }
+        }
     }
 
     protected void Edit()

@@ -110,11 +110,11 @@ namespace web.Data.Adapters
                 DataBaseHelper.SafeSqlString(model.NameCategory),
                 DataBaseHelper.SafeSqlString(model.DescriptionCategory),
                 DataBaseHelper.SafeSqlString(stringDate),
-                DataBaseHelper.RawSafeSqlString(model.IsIncome),
+                DataBaseHelper.SafeSqlString(model.IsIncome),
                 DataBaseHelper.RawSafeSqlString(model.ExpenditureId),
                 DataBaseHelper.RawSafeSqlString(model.ReceiptId),
                 DataBaseHelper.SafeSqlString(model.UserId),
-                DataBaseHelper.RawSafeSqlString(model.IsCheckForDelete));
+                DataBaseHelper.SafeSqlString(model.IsCheckForDelete));
 
                 var dataResult = DataBaseHelper.RunSql(sql);
             }
@@ -138,11 +138,11 @@ namespace web.Data.Adapters
                 DataBaseHelper.SafeSqlString(model.NameCategory),
                 DataBaseHelper.SafeSqlString(model.DescriptionCategory),
                 DataBaseHelper.SafeSqlString(stringDate),
-                DataBaseHelper.RawSafeSqlString(model.IsIncome),
+                DataBaseHelper.SafeSqlString(model.IsIncome),
                 DataBaseHelper.RawSafeSqlString(model.ExpenditureId),
                 DataBaseHelper.RawSafeSqlString(model.ReceiptId),
                 DataBaseHelper.SafeSqlString(model.UserId),
-                DataBaseHelper.RawSafeSqlString(model.IsCheckForDelete));
+                DataBaseHelper.SafeSqlString(model.IsCheckForDelete));
 
                 var dataResult = DataBaseHelper.RunSql(sql);
             }

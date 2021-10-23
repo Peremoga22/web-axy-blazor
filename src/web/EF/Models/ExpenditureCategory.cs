@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace web.EF.Models
 {
-    public class Expenditure
+    public class ExpenditureCategory
     {
         [Key]
+        public int ExpenditureCategoryId { get; set; }
+        public string Description { get; set; }
+        public decimal CurrentSum { get; set; }     
         public int ExpenditureId { get; set; }
-        public string Name { get; set; }
-        public decimal Sum { get; set; }
-        [ForeignKey("ExpenditureCategoryId")]
-        public virtual ExpenditureCategory ExpenditureCategories { get; set; }
+        public bool IsShowUp { get; set; }
     }
 }
