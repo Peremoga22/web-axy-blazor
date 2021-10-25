@@ -1,0 +1,55 @@
+USE [axy-blazor2]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_SaveExpenditureCategory]    Script Date: 25.10.2021 21:02:43 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		
+-- Create date: 
+-- Description:
+-- =============================================
+Create procedure [dbo].[sp_SaveExpenditureCategory] 
+		@ExpenditureCategoryId int,
+		@Description nvarchar(25),
+		@CurrentSum decimal(18,2),
+		@ExpenditureId int,
+		@IsShowUp bit
+AS
+BEGIN	
+	SET NOCOUNT ON;
+	SET IDENTITY_INSERT ExpenditureCategories OFF
+	SET @CurrentSum = CAST(CAST(ISNULL(@CurrentSum, 0) as decimal(16,3)) AS decimal(16,3))
+	IF(@ExpenditureCategoryId > 0)
+	BEGIN
+		UPDATE ExpenditureCategories
+		SET 
+		Description =@Description,
+		CurrentSum = @CurrentSum,
+		ExpenditureId =@ExpenditureId,
+		IsShowUp =@IsShowUp
+		WHERE ExpenditureCategoryId =@ExpenditureCategoryId
+ 	END
+	ELSE
+    BEGIN 	
+		  INSERT ExpenditureCategories
+		  (
+			  Description,
+			  CurrentSum,
+			  ExpenditureId,
+			  IsShowUp
+		  )
+		  VALUES
+		  (			 
+			  @Description,
+			  @CurrentSum,
+			  @ExpenditureId,
+			  @IsShowUp			 
+		  )	
+             SELECT SCOPE_IDENTITY() As ExpenditureCategoryId	 	 
+	END	
+	
+END
+
+

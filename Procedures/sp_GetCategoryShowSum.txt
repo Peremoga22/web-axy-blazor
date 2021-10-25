@@ -1,0 +1,22 @@
+USE [axy-blazor2]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetCategoryShowSum]    Script Date: 25.10.2021 20:56:53 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		
+-- Create date: 
+-- Description:
+-- =============================================
+Create procedure [dbo].[sp_GetCategoryShowSum] 
+	@ExpenditureId int
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+	
+	  select Sum(CurrentSum) as CurrentAllSum from ExpenditureCategories where ExpenditureId = @ExpenditureId
+END
+

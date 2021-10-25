@@ -1,0 +1,35 @@
+USE [axy-blazor2]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetExpenditureID]    Script Date: 25.10.2021 21:00:08 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		
+-- Create date: 
+-- Description:
+-- =============================================
+Create procedure [dbo].[sp_GetExpenditureID] 
+	@ExpenditureId int,
+	@UserId nvarchar(max)
+AS
+BEGIN	
+	SET NOCOUNT ON;
+	BEGIN 
+	SELECT 
+	exCateg.ExpenditureCategoryId,
+	exCateg.Description,
+	expend.Name AS CategoryName,
+	exCateg.CurrentSum,
+	exCateg.ExpenditureId,
+	exCateg.IsShowUp,
+	categ.CurentData AS CurrentDate		
+	FROM Expenditures expend	
+	LEFT JOIN ExpenditureCategories exCateg on expend.ExpenditureId = expend.ExpenditureId
+	LEFT JOIN Categories categ ON categ.ExpenditureId = expend.ExpenditureId
+	WHERE expend.ExpenditureId = @ExpenditureId and	 exCateg.ExpenditureId =@ExpenditureId and categ.UserId =@UserId			
+	END 	
+END
+
+
