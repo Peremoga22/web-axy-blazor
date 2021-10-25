@@ -13,7 +13,7 @@ namespace web.Data.ModelDtos
         public decimal CurrentSum { get; set; }
         public int ExpenditureId { get; set; }
         public bool IsShowUp { get; set; }
-
+        public decimal CurrentAllSum { get; set; }
         public DateTime CurrentDate { get; set; }
     }
 }

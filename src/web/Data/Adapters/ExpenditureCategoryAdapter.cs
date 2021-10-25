@@ -40,6 +40,52 @@ namespace web.Data.Adapters
             return result;
         }
 
+        public static List<ExpenditureCategoryDto> GetExpenditureCategoSowSum(int categoryId)
+        {
+            var result = new List<ExpenditureCategoryDto>();
+
+            var sql = string.Format(@"EXEC [sp_GetCategoryShowSum] {0}",
+            DataBaseHelper.RawSafeSqlString(categoryId));
+            var sqlResult = DataBaseHelper.GetSqlResult(sql);
+
+            if (sqlResult.Rows.Count > 0)
+            {
+                foreach (DataRow item in sqlResult.Rows)
+                {
+                    result.Add(new ExpenditureCategoryDto
+                    {
+                        CurrentAllSum = DataBaseHelper.GetDecimalValueFromRowByName(item, "CurrentAllSum")                       
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public static ExpenditureCategoryDto GetExpenditureCategoById(int Id)
+        {
+            ExpenditureCategoryDto result = new ExpenditureCategoryDto();
+
+            var sql = string.Format(@"EXEC [sp_GetExpenditureCategoryDetailID] {0}",
+               DataBaseHelper.RawSafeSqlString(Id));
+            var sqlResult = DataBaseHelper.GetSqlResult(sql);
+
+            if (sqlResult.Rows.Count > 0)
+            {
+                result = new ExpenditureCategoryDto
+                {
+                    ExpenditureCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ExpenditureCategoryId"),                  
+                    Description = DataBaseHelper.GetValueFromRowByName(sqlResult.Rows[0], "Description"),
+                    CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(sqlResult.Rows[0], "CurrentDate"),
+                    IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(sqlResult.Rows[0], "IsShowUp"),                
+                    ExpenditureId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ExpenditureId"),              
+                    CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(sqlResult.Rows[0], "CurrentSum")
+                };
+            }
+
+            return result;
+        }
+
         public static int SaveExpenditureCategory(ExpenditureCategoryDto model)
         {
             var sql = string.Empty;

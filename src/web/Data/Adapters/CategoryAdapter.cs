@@ -12,7 +12,7 @@ namespace web.Data.Adapters
 {
     public static class CategoryAdapter
     {
-        public static IEnumerable<CategoryDto> GetCategory(string userId)
+        public static List<CategoryDto> GetCategory(string userId)
         {
             var result = new List<CategoryDto>();
 
@@ -47,7 +47,7 @@ namespace web.Data.Adapters
         }
 
 
-        public static IEnumerable<CategoryDto> GetCategoryList(CategoryDto model)
+        public static List<CategoryDto> GetCategoryList(CategoryDto model)
         {
             var result = new List<CategoryDto>();
 
@@ -57,10 +57,12 @@ namespace web.Data.Adapters
             var endDateString = model.EndDate.ToString(endDate);
             string sql = null;
 
-            sql = string.Format(@"exec [sp_GetCategoryFilter] {0}, {1},{2}",
+            sql = string.Format(@"exec [sp_GetCategoryFilter] {0}, {1},{2},{3},{4}",
             DataBaseHelper.SafeSqlString(startDateString),
             DataBaseHelper.SafeSqlString(endDateString),
-            DataBaseHelper.SafeSqlString(model.IsIncome));          
+            DataBaseHelper.SafeSqlString(model.IsIncome),
+            DataBaseHelper.SafeSqlString(model.UserId),
+            DataBaseHelper.SafeSqlString(model.Filter));          
             var sqlResult = DataBaseHelper.GetSqlResult(sql);
 
             if (sqlResult.Rows.Count > 0)
