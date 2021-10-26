@@ -285,7 +285,6 @@
         }
 
         model.StartDate = this.model.StartDate;
-        // model.StartDate = DateTime.Now;
         model.EndDate = this.model.EndDate;
         Collapsed = true;
     }
@@ -319,7 +318,23 @@
         }
 
         popup = false;
-        modelList = CategoryAdapter.GetCategory(userId);
+        var count = 0;
+        model.UserId = userId;
+        modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+        foreach (var item in modelList)
+        {
+            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+            if (sum.CurrentAllSum > 0)
+            {
+                modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+            }
+
+            count++;
+        }
+
+        model.StartDate = DateTime.Now;
+        model.EndDate = DateTime.Now;
     }
 
     public void IsReceiptsExpenditures()

@@ -7,6 +7,6 @@ namespace web.Data.SumPies
 {
     public class SumExpenditure : SumPieBase
     {
-        public string SumPercentage2 => this.SumReceipt - this.SumExpenditure +"";
+        public string SumPercentage2 =>   this.SumExpenditure - this.SumReceipt + "";
     }
 }

@@ -111,15 +111,29 @@
 
     private async Task GeneratePieChartBlazorExpenditure()
     {
-        categoryList = CategoryAdapter.GetCategory(userId);
-        var categorySum = CategoryAdapter.GetCategorySum();
-        var receiptSum = categorySum.Where(z => z.UserId == userId).Select(z => z.SumReceipt).FirstOrDefault();
+        //categoryList = CategoryAdapter.GetCategory(userId);
+        //var categorySum = CategoryAdapter.GetCategorySum();
+        //var receiptSum = categorySum.Where(z => z.UserId == userId).Select(z => z.SumReceipt).FirstOrDefault();
 
-        foreach (var item in categoryList.Where(z=>z.ExpenditureId>0).ToList())
+        //foreach (var item in categoryList.Where(z=>z.ExpenditureId>0).ToList())
+        //{
+        //    sumExpenditures.Add(new SumExpenditure() { NameCategory = item.NameExpenditure, SumReceipt = receiptSum, SumExpenditure = item.SumExpenditure });
+
+
+        //}
+
+        var count = 0;
+        var modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+        foreach (var item in modelList)
         {
-            sumExpenditures.Add(new SumExpenditure() { NameCategory = item.NameExpenditure, SumReceipt = receiptSum, SumExpenditure = item.SumExpenditure });
-           
+            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+            if (sum.CurrentAllSum > 0)
+            {
+                modelList[count].CurrentAllSum = sum.CurrentAllSum;
+                sumExpenditures.Add(new SumExpenditure() { NameCategory = item.NameExpenditure, SumReceipt = sum.CurrentSum, SumExpenditure = sum.CurrentAllSum });
+            }
 
+            count++;
         }
 
         await _jsRuntime.InvokeVoidAsync("GeneralPieChartExpenditure", sumExpenditures);
