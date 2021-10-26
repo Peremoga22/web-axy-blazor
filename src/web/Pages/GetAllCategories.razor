@@ -1,13 +1,13 @@
 ﻿@page "/get-all-categories"
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
-@*@bind-value="model.CurrentDate"*@
+@inject IStringLocalizer<App> _localizer
 
 
 
 <div class="alert alert-primary" role="alert" @onclick="Collaps">
     <p class="text-right" style="color:blue;">
-        Costs: @sumCost
+        @_localizer["Costs"]: @sumCost
         <i class="fa fa-bar-chart text-left p-2" style="font-size:36px; text-align:left;"></i>
         @*Costs: @sumCost*@
     </p>
@@ -20,19 +20,19 @@
         <div>
             <div class="row d-flex">
                 <div class="col-lg-12 form-group">
-                    <label for="additional">Start Date:</label>
+                    <label for="additional">@_localizer["Start Date"]:</label>
                     <input type="date" class="form-control" @bind-value="model.StartDate" />
                 </div>
             </div>
             <div class="row d-flex">
                 <div class="col-lg-12 form-group">
-                    <label for="additional">End Date:</label>
+                    <label for="additional">@_localizer["End Date"]:</label>
                     <input type="date" class="form-control" @bind-value="model.EndDate" />
                 </div>
             </div>
             <div class="row d-flex">
                 <div class="col-lg-12 form-group">
-                    <label for="additional">Choose an option:</label>
+                    <label for="additional">@_localizer["Choose an option"]:</label>
                     <InputSelect @bind-Value="model.Filter" class="form-control">
                         @foreach (var item in Enum.GetValues(typeof(Filter)))
                         {
@@ -44,8 +44,8 @@
         </div>
         <div class="row">
             <div class="ml-lg-3 m-3">
-                <button type="submit" class="btn btn-primary">&nbsp;Search&nbsp;</button>
-                <NavLink class="btn btn-outline-secondary" @onclick="ResetSearch">&nbsp;Reset&nbsp;</NavLink>
+                <button type="submit" class="btn btn-primary">&nbsp;@_localizer["Search"]&nbsp;</button>
+                <NavLink class="btn btn-outline-secondary" @onclick="ResetSearch">&nbsp;@_localizer["Reset"]&nbsp;</NavLink>
             </div>
         </div>
     </EditForm>
@@ -54,11 +54,11 @@
 <table class="table table-striped table-bordered table-sm">
     <thead>
         <tr>
-            <th class="text-right">Sum</th>
-            <th class="text-right">Name</th>
-            <th class="text-right">Date Time</th>
+            <th class="text-right">@_localizer["Sum"]</th>
+            <th class="text-right">@_localizer["Name"]</th>
+            <th class="text-right">@_localizer["Date time"]</th>
             @*<th class="text-right">Description</th>*@
-            <th class="text-center">Actions</th>
+        <th class="text-center">@_localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -105,7 +105,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Edit Category</h5>
+                        <h5 class="modal-title">@_localizer["Edit Category"]</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="(() => ClosePopup())">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -115,35 +115,35 @@
                             @if (!model.IsIncome)
                             {
                                 <tr class="form-group">
-                                    <td>Sum Income</td>
+                                    <td>@_localizer["Sum Income"]</td>
                                     <td><input class="form-control" type="number" @bind-value="model.SumReceipt" /></td>
                                 </tr>
                             }
                             else
                             {
                                 <tr class="form-group">
-                                    <td>Sum OutCome</td>
-                                    <td><input class="form-control" type="number" @bind-value="model.SumExpenditure" disabled/></td>
+                                    <td>@_localizer["Sum OutCome"]</td>
+                                    <td><input class="form-control" type="number" @bind-value="model.SumExpenditure" disabled /></td>
                                 </tr>
                             }
 
                             <tr class="form-group">
-                                <td>Name</td>
+                                <td>@_localizer["Name"]</td>
                                 <td><input class="form-control" type="text" @bind-value="model.NameCategory" /></td>
                             </tr>
                             <tr class="form-group">
-                                <td>Date Time</td>
+                                <td>@_localizer["Date time"]</td>
                                 <td><input class="form-control" type="date" @bind-value="model.CurrentDate" /></td>
                             </tr>
                             <tr class="form-group">
-                                <td>Description</td>
+                                <td>@_localizer["Description"]</td>
                                 <td><input class="form-control" type="text" @bind-value="model.DescriptionCategory" /></td>
                             </tr>
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                        <button type="button" class="btn btn-secondary" @onclick="(() => ClosePopup())" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">@_localizer["Save changes"]</button>
+                        <button type="button" class="btn btn-secondary" @onclick="(() => ClosePopup())" data-dismiss="modal">@_localizer["Close"]</button>
                     </div>
                 </div>
             </div>

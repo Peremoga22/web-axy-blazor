@@ -36,6 +36,8 @@ namespace web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
             ConnectionString.Value = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
@@ -60,6 +62,19 @@ namespace web
             services.AddTransient<IEmailService, EmailClient>();
         }
 
+        private RequestLocalizationOptions GetLocalizationOptions()
+        {
+            var cultures = Configuration.GetSection("Cultures")
+                .GetChildren().ToDictionary(x => x.Key, x => x.Value);
+
+            var supportedCultures = cultures.Keys.ToArray();
+
+            var localizationOptions = new RequestLocalizationOptions()
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            return localizationOptions;
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -77,6 +92,8 @@ namespace web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseRequestLocalization(GetLocalizationOptions());
 
             app.UseRouting();
 
