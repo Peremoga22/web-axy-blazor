@@ -9,13 +9,13 @@ using web.Data.ModelDtos;
 
 namespace web.Data.Adapters
 {
-    public static class ExpenditureCategoryAdapter
+    public class RecieptCategoryAdapter
     {
-        public static List<ExpenditureCategoryDto> GetExpenditureCategorId(int categoryId, string userId)
+        public static List<RecieptCategoryDto> GetRecieptCategorId(int categoryId, string userId)
         {
-            var result = new List<ExpenditureCategoryDto>();
+            var result = new List<RecieptCategoryDto>();
 
-            var sql = string.Format(@"EXEC [sp_GetExpenditureID] {0}, {1}",
+            var sql = string.Format(@"EXEC [sp_GetRecieptCategoryID] {0}, {1}",
             DataBaseHelper.RawSafeSqlString(categoryId),
             DataBaseHelper.SafeSqlString(userId));
             var sqlResult = DataBaseHelper.GetSqlResult(sql);
@@ -24,27 +24,27 @@ namespace web.Data.Adapters
             {
                 foreach (DataRow item in sqlResult.Rows)
                 {
-                    result.Add(new ExpenditureCategoryDto
+                    result.Add(new RecieptCategoryDto
                     {
-                        ExpenditureCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ExpenditureCategoryId"),
+                        RecieptCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ReceiptCategoryId"),
                         Description = DataBaseHelper.GetValueFromRowByName(item, "Description"),
                         CategoryName = DataBaseHelper.GetValueFromRowByName(item, "CategoryName"),
                         CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(item, "CurrentSum"),
-                        ExpenditureId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ExpenditureId"),
+                        RecieptId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ReceiptId"),
                         IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(item, "IsShowUp"),
                         CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(item, "CurrentDate")
                     });
                 }
-            }                     
+            }
 
             return result;
         }
 
-        public static List<ExpenditureCategoryDto> GetExpenditureCategoSowSum(int categoryId)
+        public static List<RecieptCategoryDto> GetRecieptCategoSowSum(int categoryId)
         {
-            var result = new List<ExpenditureCategoryDto>();
+            var result = new List<RecieptCategoryDto>();
 
-            var sql = string.Format(@"EXEC [sp_GetCategoryShowSum] {0}",
+            var sql = string.Format(@"EXEC [sp_GetRecieptCategoryShowSum] {0}",
             DataBaseHelper.RawSafeSqlString(categoryId));
             var sqlResult = DataBaseHelper.GetSqlResult(sql);
 
@@ -52,9 +52,9 @@ namespace web.Data.Adapters
             {
                 foreach (DataRow item in sqlResult.Rows)
                 {
-                    result.Add(new ExpenditureCategoryDto
+                    result.Add(new RecieptCategoryDto
                     {
-                        CurrentAllSum = DataBaseHelper.GetDecimalValueFromRowByName(item, "CurrentAllSum")                       
+                        CurrentAllSum = DataBaseHelper.GetDecimalValueFromRowByName(item, "CurrentAllSum")
                     });
                 }
             }
@@ -62,23 +62,24 @@ namespace web.Data.Adapters
             return result;
         }
 
-        public static ExpenditureCategoryDto GetExpenditureCategoById(int Id)
-        {
-            ExpenditureCategoryDto result = new ExpenditureCategoryDto();
 
-            var sql = string.Format(@"EXEC [sp_GetExpenditureCategoryDetailID] {0}",
+        public static RecieptCategoryDto GetRecieptCategoById(int Id)
+        {
+            RecieptCategoryDto result = new RecieptCategoryDto();
+
+            var sql = string.Format(@"EXEC [sp_GetRecieptCategoryDetailID] {0}",
                DataBaseHelper.RawSafeSqlString(Id));
             var sqlResult = DataBaseHelper.GetSqlResult(sql);
 
             if (sqlResult.Rows.Count > 0)
             {
-                result = new ExpenditureCategoryDto
+                result = new RecieptCategoryDto
                 {
-                    ExpenditureCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ExpenditureCategoryId"),                  
+                    RecieptCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ReceiptCategoryId"),
                     Description = DataBaseHelper.GetValueFromRowByName(sqlResult.Rows[0], "Description"),
                     CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(sqlResult.Rows[0], "CurrentDate"),
-                    IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(sqlResult.Rows[0], "IsShowUp"),                
-                    ExpenditureId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ExpenditureId"),              
+                    IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(sqlResult.Rows[0], "IsShowUp"),
+                    RecieptId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ReceiptId"),
                     CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(sqlResult.Rows[0], "CurrentSum")
                 };
             }
@@ -86,28 +87,28 @@ namespace web.Data.Adapters
             return result;
         }
 
-        public static int SaveExpenditureCategory(ExpenditureCategoryDto model)
+        public static int SaveRecieptCategory(RecieptCategoryDto model)
         {
             var sql = string.Empty;
-            if (model.ExpenditureCategoryId > 0)
+            if (model.RecieptCategoryId > 0)
             {
-                sql = string.Format(@"EXEC [sp_SaveExpenditureCategory] {0}, {1},{2},{3},{4}",
-                DataBaseHelper.RawSafeSqlString(model.ExpenditureCategoryId),
+                sql = string.Format(@"EXEC [sp_SaveRecieptCategory] {0}, {1},{2},{3},{4}",
+                DataBaseHelper.RawSafeSqlString(model.RecieptCategoryId),
                 DataBaseHelper.SafeSqlString(model.Description),
                 DataBaseHelper.RawSafeSglDecimal((decimal)model.CurrentSum),
-                DataBaseHelper.RawSafeSqlString(model.ExpenditureId),
+                DataBaseHelper.RawSafeSqlString(model.RecieptId),
                 DataBaseHelper.SafeSqlString(model.IsShowUp));
 
                 DataBaseHelper.RunSql(sql);
                 return 0;
             }
 
-            var ExpenditureCategoryId = 0;
-            sql = string.Format(@"EXEC [sp_SaveExpenditureCategory] {0}, {1},{2},{3},{4}",
-            DataBaseHelper.RawSafeSqlString(model.ExpenditureCategoryId),
+            var RecieptCategoryId = 0;
+            sql = string.Format(@"EXEC [sp_SaveRecieptCategory] {0}, {1},{2},{3},{4}",
+            DataBaseHelper.RawSafeSqlString(model.RecieptCategoryId),
             DataBaseHelper.SafeSqlString(model.Description),
             DataBaseHelper.RawSafeSglDecimal((decimal)model.CurrentSum),
-            DataBaseHelper.RawSafeSqlString(model.ExpenditureId),
+            DataBaseHelper.RawSafeSqlString(model.RecieptId),
             DataBaseHelper.SafeSqlString(model.IsShowUp));
 
             var dataResult = DataBaseHelper.GetSqlResult(sql);
@@ -115,18 +116,18 @@ namespace web.Data.Adapters
             {
                 foreach (DataRow row in dataResult.Rows)
                 {
-                    ExpenditureCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(dataResult.Rows[0], "ExpenditureCategoryId");
+                    RecieptCategoryId = DataBaseHelper.GetIntegerValueFromRowByName(dataResult.Rows[0], "RecieptCategoryId");
                 }
             }
 
-            return ExpenditureCategoryId;
+            return RecieptCategoryId;
         }
 
-        public static void DeleteExpenditureCategory(int id)
+        public static void DeleteRecieptCategory(int id)
         {
             if (id > 0)
             {
-                string sql = string.Format(@"exec sp_RemoveExpenditureCategory {0}",
+                string sql = string.Format(@"exec sp_RemoveReceiptCategory {0}",
                 DataBaseHelper.RawSafeSqlString(id));
                 DataBaseHelper.RunSql(sql);
             }

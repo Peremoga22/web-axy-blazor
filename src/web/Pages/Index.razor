@@ -123,7 +123,7 @@
                 receiptModel.AddRange(receiptTemp);
             }
 
-            var getSum = CategoryAdapter.GetCategorySum();
+            var getSum = CategoryAdapter.GetCategorySum(userId);
             var takeSum = getSum.Where(z=>z.UserId == userId).FirstOrDefault();
             var sumExpenditure = getSum.Where(z=>z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
             if(takeSum != null)
@@ -153,19 +153,21 @@
         {
             if (!Approved)
             {
-                var receipt = new ReceiptDto();
+                var receipt = new RecieptCategoryDto();
                 model.NameCategory = receiptModel.Where(z => z.Id == model.ReceiptId).Select(z => z.Name).FirstOrDefault();
                 model.ExpenditureId = 0;
                 model.SumExpenditure = 0;
-                receipt.Id = receiptModel.Where(z => z.Id == model.ReceiptId).Select(z => z.Id).FirstOrDefault();
-                receipt.Name = model.NameCategory;
-                receipt.Sum = model.SumReceipt;
-                ReceiptAdapter.SaveReceipt(receipt);
+                receipt.RecieptId = receiptModel.Where(z => z.Id == model.ReceiptId).Select(z => z.Id).FirstOrDefault();
+                receipt.CategoryName = model.NameCategory;
+                receipt.CurrentSum = model.SumReceipt;
+                receipt.Description = model.DescriptionCategory;
+                receipt.IsShowUp = true;
+                RecieptCategoryAdapter.SaveRecieptCategory(receipt);
 
                 model.Id = CategoryAdapter.GetCategory(userId).Where(z => z.ReceiptId == model.ReceiptId).Select(z=>z.Id).FirstOrDefault();
-                model.IsCheckForDelete = true;              
+                model.IsCheckForDelete = true;
                 model.UserId = userId;
-                model.ReceiptId = receipt.Id;
+                model.ReceiptId = receipt.RecieptId;
                 CategoryAdapter.SaveCategory(model);
             }
             else
@@ -182,7 +184,7 @@
                 ExpenditureCategoryAdapter.SaveExpenditureCategory(expenditure);
 
                 model.Id = CategoryAdapter.GetCategory(userId).Where(z => z.ExpenditureId == model.ExpenditureId).Select(z => z.Id).FirstOrDefault();
-                model.IsCheckForDelete = true;              
+                model.IsCheckForDelete = true;
                 model.UserId = userId;
                 model.ExpenditureId = expenditure.ExpenditureId;
                 CategoryAdapter.SaveCategory(model);
@@ -193,14 +195,14 @@
             model.CurrentDate = DateTime.Now;
 
 
-            var getSum = CategoryAdapter.GetCategorySum();
+            var getSum = CategoryAdapter.GetCategorySum(userId);
             var sumReceipt = getSum.Where(z=>z.UserId == userId).Select(z => z.SumReceipt).FirstOrDefault();
             var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
             model.CurrentBalance = sumReceipt - sumExpenditure;
             model.SavingForThisMounth = sumReceipt - sumExpenditure;
             model.BalanceTheBeginningMounth = sumReceipt;
-                                   
-             _jsRuntime.InvokeVoidAsync("loadScripts");
+
+            _jsRuntime.InvokeVoidAsync("loadScripts");
         }
     }
 

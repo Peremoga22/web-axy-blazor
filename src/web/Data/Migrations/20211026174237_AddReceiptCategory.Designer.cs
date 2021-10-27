@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using web.Data;
 
 namespace web.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211026174237_AddReceiptCategory")]
+    partial class AddReceiptCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -316,7 +318,7 @@ namespace web.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ReceiptCategoryId")
+                    b.Property<int?>("ReceiptCategoriesReceiptCategoryId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Sum")
@@ -324,7 +326,7 @@ namespace web.Data.Migrations
 
                     b.HasKey("ReceiptId");
 
-                    b.HasIndex("ReceiptCategoryId");
+                    b.HasIndex("ReceiptCategoriesReceiptCategoryId");
 
                     b.ToTable("Receipts");
                 });
@@ -342,11 +344,11 @@ namespace web.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ExpenditureId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsShowUp")
                         .HasColumnType("bit");
-
-                    b.Property<int>("ReceiptId")
-                        .HasColumnType("int");
 
                     b.HasKey("ReceiptCategoryId");
 
@@ -432,7 +434,7 @@ namespace web.Data.Migrations
                 {
                     b.HasOne("web.EF.Models.ReceiptCategory", "ReceiptCategories")
                         .WithMany()
-                        .HasForeignKey("ReceiptCategoryId");
+                        .HasForeignKey("ReceiptCategoriesReceiptCategoryId");
 
                     b.Navigation("ReceiptCategories");
                 });

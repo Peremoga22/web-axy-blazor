@@ -25,5 +25,6 @@ namespace web.Data
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<Expenditure> Expenditures { get; set; }
         public DbSet<ExpenditureCategory> ExpenditureCategories { get; set; }
+        public DbSet<ReceiptCategory> ReceiptCategories { get; set; }
     }
 }

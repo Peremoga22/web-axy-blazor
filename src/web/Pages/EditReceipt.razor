@@ -1,4 +1,4 @@
-﻿@page "/edit-expenditure/{Id:int}"
+﻿@page "/edit-receipt/{Id:int}"
 @inject NavigationManager _navigationManager
 @inject IStringLocalizer<App> _localizer
 
@@ -18,7 +18,7 @@
             <tr>
                 @if (item.IsShowUp)
                 {
-                    <td class="text-right" style="color:red">@item.Description</td>
+                    <td class="text-right" style="color:green">@item.Description</td>
                     <td class="text-right">@item.CurrentSum</td>
 
                     <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
@@ -26,10 +26,10 @@
 
                 <td class="text-center">
                     <button class="btn btn-sm btn-outline-dark">
-                        <img @onclick="(() => ShowPopup(item.ExpenditureCategoryId))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
+                        <img @onclick="(() => ShowPopup(item.RecieptCategoryId))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
                     </button>
                     <button class="btn btn-sm btn-outline-danger">
-                        <img @onclick="(() => Delete(item.ExpenditureCategoryId))" disabled="@DeleteDisabled" src="https://img.icons8.com/ios/21/000000/delete-forever--v1.png" />
+                        <img @onclick="(() => Delete(item.RecieptCategoryId))" disabled="@DeleteDisabled" src="https://img.icons8.com/ios/21/000000/delete-forever--v1.png" />
                     </button>
                 </td>
             </tr>
@@ -78,22 +78,22 @@
     </EditForm>
 }
 
-
 @code {
-
     [Parameter]
     public int Id { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    List<ExpenditureCategoryDto> modelList = new List<ExpenditureCategoryDto>();
-    ExpenditureCategoryDto model = new ExpenditureCategoryDto();
+    List<RecieptCategoryDto> modelList = new List<RecieptCategoryDto>();
+    RecieptCategoryDto model = new RecieptCategoryDto();
 
     bool popup = false;
     string DeleteDisabled { get; set; } = null;
     string userId;
     string nameCategory;
+
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationStateTask;
@@ -101,7 +101,7 @@
         if (user.Identity.IsAuthenticated)
         {
             userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
-            modelList = ExpenditureCategoryAdapter.GetExpenditureCategorId(Id, userId);
+            modelList = RecieptCategoryAdapter.GetRecieptCategorId(Id, userId);
 
             nameCategory = modelList.Select(z => z.CategoryName).FirstOrDefault();
         }
@@ -109,10 +109,11 @@
 
     private void HandleValidSubmitPopup()
     {
-        ExpenditureCategoryAdapter.SaveExpenditureCategory(model);
+
+        RecieptCategoryAdapter.SaveRecieptCategory(model);
         popup = false;
 
-        modelList = ExpenditureCategoryAdapter.GetExpenditureCategorId(Id, userId);
+        modelList = RecieptCategoryAdapter.GetRecieptCategorId(Id, userId);
         nameCategory = modelList.Select(z => z.CategoryName).FirstOrDefault();
     }
 
@@ -124,12 +125,12 @@
     public void ShowPopup(int id)
     {
         popup = true;
-        model = ExpenditureCategoryAdapter.GetExpenditureCategoById(id);
+        model = RecieptCategoryAdapter.GetRecieptCategoById(id);
     }
 
     private void Delete(int id)
     {
-        ExpenditureCategoryAdapter.DeleteExpenditureCategory(id);
-        modelList = ExpenditureCategoryAdapter.GetExpenditureCategorId(Id, userId);
+        RecieptCategoryAdapter.DeleteRecieptCategory(id);
+        modelList = RecieptCategoryAdapter.GetRecieptCategorId(Id, userId);
     }
 }

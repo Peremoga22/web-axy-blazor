@@ -212,7 +212,7 @@
                 expenditures.AddRange(receiptTemp);
             }
 
-            var getSum = CategoryAdapter.GetCategorySum();
+            var getSum = CategoryAdapter.GetCategorySum(userId);
             var takeSum = getSum.Where(z => z.UserId == userId).FirstOrDefault();
             var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
 

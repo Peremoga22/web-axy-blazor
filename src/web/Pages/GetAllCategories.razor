@@ -68,15 +68,17 @@
             <tr>
                 @if (item.IsIncome)
                 {
+                    @*@onclick="(() =>  EditExpenditure(item.Id))"*@
                     <td class="text-right" style="color:red">@item.CurrentAllSum</td>
-                    <td class="text-right" @onclick="(() =>  EditExpenditure(item.Id))"><a href="#">@item.NameCategory</a></td>
+                    <td class="text-right">@item.NameCategory</td>
                     <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
                     @*<td class="text-right">@item.DescriptionCategory</td>*@
 
                 }
                 else
                 {
-                    <td class="text-right" href="#" style="color:green">@item.SumReceipt</td>
+                     @*@onclick="(() =>  EditReceipt(item.Id))"*@
+                    <td class="text-right" href="#" style="color:green">@item.CurrentReceiptAllSum</td>
                     <td class="text-right">@item.NameCategory</td>
                     <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
                     @*<td class="text-right">@item.DescriptionCategory</td>*@
@@ -84,9 +86,10 @@
 
 
                 <td class="text-center">
+                     @*@onclick="(() => ShowPopup(item.Id))"*@
                     <button class="btn btn-sm btn-outline-dark">
                         @*<i style='font-size:14px' @onclick="(() => Edit(item.Id))" class='far fa-edit'></i>*@
-                        <img @onclick="(() => ShowPopup(item.Id))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
+                        <img  @onclick="(() =>  Edit(item.Id))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
                     </button>
                     <button class="btn btn-sm btn-outline-danger">
                         <img @onclick="(() => Delete(item.Id))" disabled="@DeleteDisabled" src="https://img.icons8.com/ios/21/000000/delete-forever--v1.png" />
@@ -181,10 +184,16 @@
             foreach (var item in modelList)
             {
                 var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+                var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
                 if (sum.CurrentAllSum > 0)
                 {
                     modelList[count].CurrentAllSum = sum.CurrentAllSum;
 
+                }
+
+                if(receiptSum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
                 }
 
                 count++;
@@ -193,7 +202,7 @@
             model.StartDate = DateTime.Now;
             model.EndDate = DateTime.Now;
 
-            var getSum = CategoryAdapter.GetCategorySum();
+            var getSum = CategoryAdapter.GetCategorySum(userId);
             var takeSum = getSum.Where(z => z.UserId == userId).FirstOrDefault();
             var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
             if (takeSum != null)
@@ -220,7 +229,16 @@
 
     protected void Edit(int id)
     {
-        _navigationManager.NavigateTo("/edit-category/" + id);
+        var receiptId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ReceiptId).FirstOrDefault();
+        var expenditureId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ExpenditureId).FirstOrDefault();
+        if (receiptId > 0)
+        {
+            _navigationManager.NavigateTo("/edit-receipt/" + receiptId);
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/edit-expenditure/" + expenditureId);
+        }
     }
 
     private void Collaps()
@@ -414,6 +432,12 @@
 
         var expenditureId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ExpenditureId).FirstOrDefault();
         _navigationManager.NavigateTo($"/edit-expenditure/{expenditureId}");
+    }
+
+    protected void EditReceipt(int id)
+    {
+        var receiptId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ReceiptId).FirstOrDefault();
+        _navigationManager.NavigateTo($"/edit-receipt/{receiptId}");
     }
 
     public enum Filter

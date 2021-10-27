@@ -29,6 +29,7 @@ namespace web.Data.ModelDtos
         public bool IsCheckForDelete { get; set; }  
         public string Filter { get; set; }
         public decimal CurrentAllSum { get; set; }
+        public decimal CurrentReceiptAllSum { get; set; }
         public string SumPercentage => (this.SumExpenditure * 100) / this.SumReceipt + "%";
     }      
 }
