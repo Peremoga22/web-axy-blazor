@@ -1,6 +1,6 @@
 USE [axy-blazor2]
 GO
-/****** Object:  StoredProcedure [dbo].[sp_GetRecieptCategoryID]    Script Date: 27/10/2021 13:24:25 ******/
+/****** Object:  StoredProcedure [dbo].[sp_GetRecieptCategoryID]    Script Date: 28/10/2021 11:48:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -24,12 +24,12 @@ BEGIN
 		recCateg.CurrentSum,
 		recCateg.ReceiptId,
 		recCateg.IsShowUp,
-		categ.CurentData AS CurrentDate
+		categ.CurentData AS CurrentDate,
+		recCateg.DateOfIncome
 	FROM Receipts rec
 	LEFT JOIN ReceiptCategories recCateg on recCateg.ReceiptId = rec.ReceiptId
 	LEFT JOIN Categories categ on categ.ReceiptId = rec.ReceiptId
 	where rec.ReceiptId = @ReceiptId and recCateg.ReceiptId = @ReceiptId and categ.UserId =@UserId
 	END 	
 END
-
 

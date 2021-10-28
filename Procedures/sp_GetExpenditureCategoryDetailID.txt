@@ -1,6 +1,6 @@
 USE [axy-blazor2]
 GO
-/****** Object:  StoredProcedure [dbo].[sp_GetExpenditureCategoryDetailID]    Script Date: 25.10.2021 20:58:56 ******/
+/****** Object:  StoredProcedure [dbo].[sp_GetExpenditureCategoryDetailID]    Script Date: 28/10/2021 14:08:00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,8 @@ BEGIN
 		cat.CurentData as CurrentDate,
 		ex.IsShowUp,
 		ex.ExpenditureId,		
-		ex.CurrentSum
+		ex.CurrentSum,
+		ex.DateOfPurchase
 	From ExpenditureCategories ex
 	LEFT JOIN Categories cat on cat.ExpenditureId = ex.ExpenditureId
 	where EX.ExpenditureCategoryId = @Id	
@@ -31,4 +32,3 @@ BEGIN
 	END 
 	
 END
-

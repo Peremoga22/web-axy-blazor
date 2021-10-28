@@ -1,0 +1,488 @@
+@page "/get-all-categories"
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject IStringLocalizer<App> _localizer
+
+
+
+<div class="alert alert-primary" role="alert" @onclick="Collaps">
+    <p class="text-right" style="color:blue;">
+        @_localizer["Costs"]: @sumCost
+        <i class="fa fa-bar-chart text-left p-2" style="font-size:36px; text-align:left;"></i>
+        @*Costs: @sumCost*@
+    </p>
+
+</div>
+<div class="@(Collapsed? "collapse": "" )">
+
+    <EditForm Model="@model" OnValidSubmit="HandleValidSubmit" class="body  p-3 mb-5 rounded ">
+        <DataAnnotationsValidator />
+        <div>
+            <div class="row d-flex">
+                <div class="col-lg-12 form-group">
+                    <label for="additional">@_localizer["Start Date"]:</label>
+                    <input type="date" class="form-control" @bind-value="model.StartDate" />
+                </div>
+            </div>
+            <div class="row d-flex">
+                <div class="col-lg-12 form-group">
+                    <label for="additional">@_localizer["End Date"]:</label>
+                    <input type="date" class="form-control" @bind-value="model.EndDate" />
+                </div>
+            </div>
+            <div class="row d-flex">
+                <div class="col-lg-12 form-group">
+                    <label for="additional">@_localizer["Choose an option"]:</label>
+                    <InputSelect @bind-Value="model.Filter" class="form-control">
+                        @foreach (var item in Enum.GetValues(typeof(Filter)))
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="ml-lg-3 m-3">
+                <button type="submit" class="btn btn-primary">&nbsp;@_localizer["Search"]&nbsp;</button>
+                <NavLink class="btn btn-outline-secondary" @onclick="ResetSearch">&nbsp;@_localizer["Reset"]&nbsp;</NavLink>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<table class="table table-striped table-bordered table-sm">
+    <thead>
+        <tr>
+            <th class="text-right">@_localizer["Sum"]</th>
+            <th class="text-right">@_localizer["Name"]</th>
+            <th class="text-right">@_localizer["Date time"]</th>
+            @*<th class="text-right">Description</th>*@
+        <th class="text-center">@_localizer["Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in modelList)
+        {
+
+            <tr>
+                @if (item.IsIncome)
+                {
+                    @*@onclick="(() =>  EditExpenditure(item.Id))"*@
+                    <td class="text-right" style="color:red">@item.CurrentAllSum</td>
+                    <td class="text-right">@item.NameCategory</td>
+                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
+                    @*<td class="text-right">@item.DescriptionCategory</td>*@
+
+                }
+                else
+                {
+                     @*@onclick="(() =>  EditReceipt(item.Id))"*@
+                    <td class="text-right" href="#" style="color:green">@item.CurrentReceiptAllSum</td>
+                    <td class="text-right">@item.NameCategory</td>
+                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
+                    @*<td class="text-right">@item.DescriptionCategory</td>*@
+                }
+
+
+                <td class="text-center">
+                     @*@onclick="(() => ShowPopup(item.Id))"*@
+                    <button class="btn btn-sm btn-outline-dark">
+                        @*<i style='font-size:14px' @onclick="(() => Edit(item.Id))" class='far fa-edit'></i>*@
+                        <img  @onclick="(() =>  Edit(item.Id))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger">
+                        <img @onclick="(() => Delete(item.Id))" disabled="@DeleteDisabled" src="https://img.icons8.com/ios/21/000000/delete-forever--v1.png" />
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@*style="display:block;"*@
+@*@if (popup)
+{
+    <EditForm Model="@model" OnValidSubmit="HandleValidSubmitPopup" class="body  p-3 mb-5 rounded ">
+        <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@_localizer["Edit Category"]</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="(() => ClosePopup())">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-bordered table-sm">
+                            @if (!model.IsIncome)
+                            {
+                                <tr class="form-group">
+                                    <td>@_localizer["Sum Income"]</td>
+                                    <td><input class="form-control" type="number" @bind-value="model.SumReceipt" /></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr class="form-group">
+                                    <td>@_localizer["Sum OutCome"]</td>
+                                    <td><input class="form-control" type="number" @bind-value="model.SumExpenditure" disabled /></td>
+                                </tr>
+                            }
+
+                            <tr class="form-group">
+                                <td>@_localizer["Name"]</td>
+                                <td><input class="form-control" type="text" @bind-value="model.NameCategory" /></td>
+                            </tr>
+                            <tr class="form-group">
+                                <td>@_localizer["Date time"]</td>
+                                <td><input class="form-control" type="date" @bind-value="model.CurrentDate" /></td>
+                            </tr>
+                            <tr class="form-group">
+                                <td>@_localizer["Description"]</td>
+                                <td><input class="form-control" type="text" @bind-value="model.DescriptionCategory" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">@_localizer["Save changes"]</button>
+                        <button type="button" class="btn btn-secondary" @onclick="(() => ClosePopup())" data-dismiss="modal">@_localizer["Close"]</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}*@
+
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    List<CategoryDto> modelList = new List<CategoryDto>();
+    CategoryDto model = new CategoryDto();
+    protected bool Collapsed = true;
+    bool popup = false;
+    decimal sumCost;
+    string DeleteDisabled { get; set; } = null;
+    string userId;
+    List<decimal> currentShowSum = new List<decimal>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        model.CurrentDate = DateTime.Now;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //var count = 0;
+            //var modelListShow = new List<CategoryDto>();
+            //userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+            //foreach (var item in modelList)
+            //{
+            //    var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+            //    var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
+            //    if (sum.CurrentAllSum > 0)
+            //    {
+            //        modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+            //    }
+
+            //    if(receiptSum.CurrentAllSum > 0)
+            //    {
+            //        modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+            //    }
+
+            //    count++;
+            //}
+            modelList = ShowDataTable(userId);
+            userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            model.StartDate = DateTime.Now;
+            model.EndDate = DateTime.Now;
+
+            var getSum = CategoryAdapter.GetCategorySum(userId);
+            var takeSum = getSum.Where(z => z.UserId == userId).FirstOrDefault();
+            var sumExpenditure = getSum.Where(z => z.UserId == userId).Select(z => z.SumExpenditure).FirstOrDefault();
+            if (takeSum != null)
+            {
+                model.CurrentBalance = takeSum.SumReceipt - sumExpenditure;
+                model.SavingForThisMounth = takeSum.SumReceipt - sumExpenditure;
+                model.BalanceTheBeginningMounth = takeSum.SumReceipt;
+                sumCost = sumExpenditure;
+            }
+        }
+
+    }
+
+    public void ShowPopup(int id)
+    {
+        popup = true;
+        model = CategoryAdapter.GetCategoryDtoId(id);
+    }
+
+    public void ClosePopup()
+    {
+        popup = false;
+    }
+
+    protected void Edit(int id)
+    {
+        var receiptId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ReceiptId).FirstOrDefault();
+        var expenditureId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ExpenditureId).FirstOrDefault();
+        if (receiptId > 0)
+        {
+            _navigationManager.NavigateTo("/edit-receipt/" + receiptId);
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/edit-expenditure/" + expenditureId);
+        }
+    }
+
+    private void Collaps()
+    {
+        //model.StartDate = DateTime.Now;
+        //model.EndDate = DateTime.Now;
+        Collapsed = !Collapsed;
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (model.Filter == "GetAll" || string.IsNullOrEmpty(model.Filter))
+        {
+            model.Filter = "GetAll";
+            var count = 0;
+            var modelListShow = new List<CategoryDto>();
+            modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+            foreach (var item in modelList)
+            {
+                var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+                var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
+                if (sum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+                }
+
+                if (receiptSum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+                }
+
+                count++;
+            }
+        }
+        else
+        {
+            switch (model.Filter)
+            {
+                case "Income":
+                    model.IsIncome = false;
+                    break;
+                case "OutCome":
+                    model.IsIncome = true;
+                    break;
+            }
+
+            var count = 0;
+            model.UserId = userId;
+            modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+            foreach (var item in modelList)
+            {
+                var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+                var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
+                if (sum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+                }
+
+                if (receiptSum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+                }
+
+                count++;
+            }
+        }
+
+        model.StartDate = this.model.StartDate;
+        model.EndDate = this.model.EndDate;
+        Collapsed = true;
+    }
+
+    //private void HandleValidSubmitPopup()
+    //{
+    //    if (model.IsIncome)
+    //    {
+    //        var expenditure = new ExpenditureDto();
+    //        expenditure.Id = (int)model.ExpenditureId;
+    //        expenditure.Name = model.NameCategory;
+    //        expenditure.Sum = model.SumExpenditure;
+    //        var expenditureId = ExpenditureAdapter.SaveExpenditure(expenditure);
+
+    //        model.UserId = userId;
+    //        model.IsCheckForDelete = true;
+    //        CategoryAdapter.SaveCategory(model);
+    //    }
+    //    else
+    //    {
+    //        var receipt = new ReceiptDto();
+    //        receipt.Id = (int)model.ReceiptId;
+    //        receipt.Name = model.NameCategory;
+    //        receipt.Sum = model.SumReceipt;
+    //        var receiptId = ReceiptAdapter.SaveReceipt(receipt);
+
+
+    //        model.UserId = userId;
+    //        model.IsCheckForDelete = true;
+    //        CategoryAdapter.SaveCategory(model);
+    //    }
+
+    //    popup = false;
+    //    var count = 0;
+    //    model.UserId = userId;
+    //    modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+    //    foreach (var item in modelList)
+    //    {
+    //        var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+    //        if (sum.CurrentAllSum > 0)
+    //        {
+    //            modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+    //        }
+
+    //        count++;
+    //    }
+
+    //    model.StartDate = DateTime.Now;
+    //    model.EndDate = DateTime.Now;
+    //}
+
+    public void IsReceiptsExpenditures()
+    {
+        if (!model.IsIncome)
+        {
+            model.IsIncome = true;
+        }
+        else
+        {
+            model.IsIncome = false;
+        }
+    }
+
+    public void ResetSearch()
+    {
+        //var count = 0;
+        //modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+        //foreach (var item in modelList)
+        //{
+        //    var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+        //    var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
+        //    if (sum.CurrentAllSum > 0)
+        //    {
+        //        modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+        //    }
+
+        //    if (receiptSum.CurrentAllSum > 0)
+        //    {
+        //        modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+        //    }
+
+        //    count++;
+        //}
+        modelList = ShowDataTable(userId);
+        model.StartDate = DateTime.Now;
+        model.EndDate = DateTime.Now;
+    }
+
+    public void Delete(int id)
+    {
+        DeleteDisabled = "disabled";
+        var checkIdExpenditure = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ExpenditureId).FirstOrDefault();
+        var checkIdReciept = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ReceiptId).FirstOrDefault();
+
+        CategoryAdapter.Delete(id);
+
+        if (checkIdExpenditure > 0)
+        {
+            ExpenditureAdapter.DeleteExpenditure((int)checkIdExpenditure);
+        }
+
+        if (checkIdReciept > 0)
+        {
+            ReceiptAdapter.DeleteReceipt((int)checkIdReciept);
+        }
+
+        ////modelList = CategoryAdapter.GetCategory(userId).Where(z => z.IsCheckForDelete == true).ToList();
+        //var count = 0;
+        //modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+        //foreach (var item in modelList)
+        //{
+        //    var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+        //    if (sum.CurrentAllSum > 0)
+        //    {
+        //        modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+        //    }
+
+        //    count++;
+        //}
+        modelList = ShowDataTable(userId);
+
+        model.StartDate = DateTime.Now;
+        model.EndDate = DateTime.Now;
+        DeleteDisabled = null;
+    }
+
+    protected void EditExpenditure(int id)
+    {
+
+        var expenditureId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ExpenditureId).FirstOrDefault();
+        _navigationManager.NavigateTo($"/edit-expenditure/{expenditureId}");
+    }
+
+    protected void EditReceipt(int id)
+    {
+        var receiptId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ReceiptId).FirstOrDefault();
+        _navigationManager.NavigateTo($"/edit-receipt/{receiptId}");
+    }
+
+    public enum Filter
+    {
+        GetAll,
+        Income,
+        OutCome
+    }
+
+    private List<CategoryDto> ShowDataTable(string userId)
+    {
+        var count = 0;
+
+        modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+        foreach (var item in modelList)
+        {
+            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+            var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
+            if (sum.CurrentAllSum > 0)
+            {
+                modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+            }
+
+            if (receiptSum.CurrentAllSum > 0)
+            {
+                modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+            }
+
+            count++;
+        }
+
+        return modelList;
+    }
+}
