@@ -162,6 +162,7 @@
                 receipt.CurrentSum = model.SumReceipt;
                 receipt.Description = model.DescriptionCategory;
                 receipt.IsShowUp = true;
+                receipt.DateOfPurchase = model.CurrentDate;
                 RecieptCategoryAdapter.SaveRecieptCategory(receipt);
 
                 model.Id = CategoryAdapter.GetCategory(userId).Where(z => z.ReceiptId == model.ReceiptId).Select(z=>z.Id).FirstOrDefault();

@@ -3,13 +3,10 @@
 @inject IJSRuntime _jsRuntime
 @inject IStringLocalizer<App> _localizer
 
-
-
 <div class="alert alert-primary" role="alert" @onclick="Collaps">
     <p class="text-right" style="color:blue;">
         @_localizer["Costs"]: @sumCost
-        <i class="fa fa-bar-chart text-left p-2" style="font-size:36px; text-align:left;"></i>
-        @*Costs: @sumCost*@
+        <i class="fa fa-bar-chart text-left p-2" style="font-size:36px; text-align:left;"></i>      
     </p>
 
 </div>
@@ -56,39 +53,30 @@
         <tr>
             <th class="text-right">@_localizer["Sum"]</th>
             <th class="text-right">@_localizer["Name"]</th>
-            <th class="text-right">@_localizer["Date time"]</th>
-            @*<th class="text-right">Description</th>*@
-        <th class="text-center">@_localizer["Actions"]</th>
+            <th class="text-right">@_localizer["Date time"]</th>           
+            <th class="text-center">@_localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in modelList)
         {
-
             <tr>
                 @if (item.IsIncome)
-                {
-                    @*@onclick="(() =>  EditExpenditure(item.Id))"*@
+                {                  
                     <td class="text-right" style="color:red">@item.CurrentAllSum</td>
                     <td class="text-right">@item.NameCategory</td>
-                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
-                    @*<td class="text-right">@item.DescriptionCategory</td>*@
-
+                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>                  
                 }
                 else
-                {
-                     @*@onclick="(() =>  EditReceipt(item.Id))"*@
+                {                   
                     <td class="text-right" href="#" style="color:green">@item.CurrentReceiptAllSum</td>
                     <td class="text-right">@item.NameCategory</td>
-                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
-                    @*<td class="text-right">@item.DescriptionCategory</td>*@
+                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>                   
                 }
 
 
-                <td class="text-center">
-                     @*@onclick="(() => ShowPopup(item.Id))"*@
-                    <button class="btn btn-sm btn-outline-dark">
-                        @*<i style='font-size:14px' @onclick="(() => Edit(item.Id))" class='far fa-edit'></i>*@
+                <td class="text-center">                   
+                    <button class="btn btn-sm btn-outline-dark">                      
                         <img  @onclick="(() =>  Edit(item.Id))" src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/21/000000/external-edit-interface-kiranshastry-solid-kiranshastry.png" />
                     </button>
                     <button class="btn btn-sm btn-outline-danger">
@@ -99,62 +87,6 @@
         }
     </tbody>
 </table>
-
-@*style="display:block;"*@
-@if (popup)
-{
-    <EditForm Model="@model" OnValidSubmit="HandleValidSubmitPopup" class="body  p-3 mb-5 rounded ">
-        <div class="modal" tabindex="-1" role="dialog" style="display:block;">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">@_localizer["Edit Category"]</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="(() => ClosePopup())">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-bordered table-sm">
-                            @if (!model.IsIncome)
-                            {
-                                <tr class="form-group">
-                                    <td>@_localizer["Sum Income"]</td>
-                                    <td><input class="form-control" type="number" @bind-value="model.SumReceipt" /></td>
-                                </tr>
-                            }
-                            else
-                            {
-                                <tr class="form-group">
-                                    <td>@_localizer["Sum OutCome"]</td>
-                                    <td><input class="form-control" type="number" @bind-value="model.SumExpenditure" disabled /></td>
-                                </tr>
-                            }
-
-                            <tr class="form-group">
-                                <td>@_localizer["Name"]</td>
-                                <td><input class="form-control" type="text" @bind-value="model.NameCategory" /></td>
-                            </tr>
-                            <tr class="form-group">
-                                <td>@_localizer["Date time"]</td>
-                                <td><input class="form-control" type="date" @bind-value="model.CurrentDate" /></td>
-                            </tr>
-                            <tr class="form-group">
-                                <td>@_localizer["Description"]</td>
-                                <td><input class="form-control" type="text" @bind-value="model.DescriptionCategory" /></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">@_localizer["Save changes"]</button>
-                        <button type="button" class="btn btn-secondary" @onclick="(() => ClosePopup())" data-dismiss="modal">@_localizer["Close"]</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </EditForm>
-}
-
-
 
 @code {
     [CascadingParameter]
@@ -177,28 +109,9 @@
 
         if (user.Identity.IsAuthenticated)
         {
-            var count = 0;
-            var modelListShow = new List<CategoryDto>();
+            userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;          
+            modelList = ShowDataTable(userId);
             userId = user.FindFirst(ClaimTypes.NameIdentifier).Value;
-            modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
-            foreach (var item in modelList)
-            {
-                var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
-                var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
-                if (sum.CurrentAllSum > 0)
-                {
-                    modelList[count].CurrentAllSum = sum.CurrentAllSum;
-
-                }
-
-                if(receiptSum.CurrentAllSum > 0)
-                {
-                    modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
-                }
-
-                count++;
-            }
-
             model.StartDate = DateTime.Now;
             model.EndDate = DateTime.Now;
 
@@ -213,7 +126,6 @@
                 sumCost = sumExpenditure;
             }
         }
-
     }
 
     public void ShowPopup(int id)
@@ -242,9 +154,7 @@
     }
 
     private void Collaps()
-    {
-        //model.StartDate = DateTime.Now;
-        //model.EndDate = DateTime.Now;
+    {       
         Collapsed = !Collapsed;
     }
 
@@ -253,17 +163,22 @@
         if (model.Filter == "GetAll" || string.IsNullOrEmpty(model.Filter))
         {
             model.Filter = "GetAll";
-            //  modelList = CategoryAdapter.GetCategory(userId);
             var count = 0;
-            model.UserId = userId;
-            modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+            var modelListShow = new List<CategoryDto>();
+            modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
             foreach (var item in modelList)
             {
                 var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+                var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
                 if (sum.CurrentAllSum > 0)
                 {
                     modelList[count].CurrentAllSum = sum.CurrentAllSum;
 
+                }
+
+                if (receiptSum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
                 }
 
                 count++;
@@ -281,79 +196,32 @@
                     break;
             }
 
-
-
             var count = 0;
             model.UserId = userId;
-            //  modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
             modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
             foreach (var item in modelList)
             {
                 var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+                var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
                 if (sum.CurrentAllSum > 0)
                 {
                     modelList[count].CurrentAllSum = sum.CurrentAllSum;
 
                 }
 
+                if (receiptSum.CurrentAllSum > 0)
+                {
+                    modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+                }
+
                 count++;
             }
-
-            // modelList = CategoryAdapter.GetCategoryList(model);
         }
 
         model.StartDate = this.model.StartDate;
         model.EndDate = this.model.EndDate;
         Collapsed = true;
-    }
-
-    private void HandleValidSubmitPopup()
-    {
-        if (model.IsIncome)
-        {
-            var expenditure = new ExpenditureDto();
-            expenditure.Id = (int)model.ExpenditureId;
-            expenditure.Name = model.NameCategory;
-            expenditure.Sum = model.SumExpenditure;
-            var expenditureId = ExpenditureAdapter.SaveExpenditure(expenditure);
-
-            model.UserId = userId;
-            model.IsCheckForDelete = true;
-            CategoryAdapter.SaveCategory(model);
-        }
-        else
-        {
-            var receipt = new ReceiptDto();
-            receipt.Id = (int)model.ReceiptId;
-            receipt.Name = model.NameCategory;
-            receipt.Sum = model.SumReceipt;
-            var receiptId = ReceiptAdapter.SaveReceipt(receipt);
-
-
-            model.UserId = userId;
-            model.IsCheckForDelete = true;
-            CategoryAdapter.SaveCategory(model);
-        }
-
-        popup = false;
-        var count = 0;
-        model.UserId = userId;
-        modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
-        foreach (var item in modelList)
-        {
-            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
-            if (sum.CurrentAllSum > 0)
-            {
-                modelList[count].CurrentAllSum = sum.CurrentAllSum;
-
-            }
-
-            count++;
-        }
-
-        model.StartDate = DateTime.Now;
-        model.EndDate = DateTime.Now;
-    }
+    }     
 
     public void IsReceiptsExpenditures()
     {
@@ -368,23 +236,8 @@
     }
 
     public void ResetSearch()
-    {
-
-        var count = 0;
-        model.UserId = userId;
-        modelList = CategoryAdapter.GetCategoryList(model).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
-        foreach (var item in modelList)
-        {
-            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
-            if (sum.CurrentAllSum > 0)
-            {
-                modelList[count].CurrentAllSum = sum.CurrentAllSum;
-
-            }
-
-            count++;
-        }
-
+    {     
+        modelList = ShowDataTable(userId);
         model.StartDate = DateTime.Now;
         model.EndDate = DateTime.Now;
     }
@@ -406,21 +259,8 @@
         {
             ReceiptAdapter.DeleteReceipt((int)checkIdReciept);
         }
-
-        //modelList = CategoryAdapter.GetCategory(userId).Where(z => z.IsCheckForDelete == true).ToList();
-        var count = 0;
-        modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
-        foreach (var item in modelList)
-        {
-            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
-            if (sum.CurrentAllSum > 0)
-            {
-                modelList[count].CurrentAllSum = sum.CurrentAllSum;
-
-            }
-
-            count++;
-        }
+             
+        modelList = ShowDataTable(userId);
 
         model.StartDate = DateTime.Now;
         model.EndDate = DateTime.Now;
@@ -429,7 +269,6 @@
 
     protected void EditExpenditure(int id)
     {
-
         var expenditureId = CategoryAdapter.GetCategory(userId).Where(z => z.Id == id).Select(z => z.ExpenditureId).FirstOrDefault();
         _navigationManager.NavigateTo($"/edit-expenditure/{expenditureId}");
     }
@@ -445,5 +284,31 @@
         GetAll,
         Income,
         OutCome
+    }
+
+    private List<CategoryDto> ShowDataTable(string userId)
+    {
+        var count = 0;
+
+        modelList = CategoryAdapter.GetCategory(userId).Where(z => !string.IsNullOrEmpty(z.DescriptionCategory)).ToList();
+        foreach (var item in modelList)
+        {
+            var sum = ExpenditureCategoryAdapter.GetExpenditureCategoSowSum((int)item.ExpenditureId).FirstOrDefault();
+            var receiptSum = RecieptCategoryAdapter.GetRecieptCategoSowSum((int)item.ReceiptId).FirstOrDefault();
+            if (sum.CurrentAllSum > 0)
+            {
+                modelList[count].CurrentAllSum = sum.CurrentAllSum;
+
+            }
+
+            if (receiptSum.CurrentAllSum > 0)
+            {
+                modelList[count].CurrentReceiptAllSum = receiptSum.CurrentAllSum;
+            }
+
+            count++;
+        }
+
+        return modelList;
     }
 }

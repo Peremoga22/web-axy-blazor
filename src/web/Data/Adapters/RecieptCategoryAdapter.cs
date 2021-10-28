@@ -32,7 +32,8 @@ namespace web.Data.Adapters
                         CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(item, "CurrentSum"),
                         RecieptId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ReceiptId"),
                         IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(item, "IsShowUp"),
-                        CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(item, "CurrentDate")
+                        CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(item, "CurrentDate"),
+                        DateOfPurchase = DataBaseHelper.GetDateTimeValueFromRowByName(item, "DateOfPurchase")
                     });
                 }
             }
@@ -80,7 +81,8 @@ namespace web.Data.Adapters
                     CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(sqlResult.Rows[0], "CurrentDate"),
                     IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(sqlResult.Rows[0], "IsShowUp"),
                     RecieptId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ReceiptId"),
-                    CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(sqlResult.Rows[0], "CurrentSum")
+                    CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(sqlResult.Rows[0], "CurrentSum"),
+                    DateOfPurchase = DataBaseHelper.GetDateTimeValueFromRowByName(sqlResult.Rows[0], "DateOfPurchase")
                 };
             }
 
@@ -89,27 +91,31 @@ namespace web.Data.Adapters
 
         public static int SaveRecieptCategory(RecieptCategoryDto model)
         {
+            var format = "yyyy-MM-dd HH:mm:ss:fff";
+            var stringDate = model.DateOfPurchase.ToString(format);
             var sql = string.Empty;
             if (model.RecieptCategoryId > 0)
             {
-                sql = string.Format(@"EXEC [sp_SaveRecieptCategory] {0}, {1},{2},{3},{4}",
+                sql = string.Format(@"EXEC [sp_SaveRecieptCategory] {0}, {1},{2},{3},{4},{5}",
                 DataBaseHelper.RawSafeSqlString(model.RecieptCategoryId),
                 DataBaseHelper.SafeSqlString(model.Description),
                 DataBaseHelper.RawSafeSglDecimal((decimal)model.CurrentSum),
                 DataBaseHelper.RawSafeSqlString(model.RecieptId),
-                DataBaseHelper.SafeSqlString(model.IsShowUp));
+                DataBaseHelper.SafeSqlString(model.IsShowUp),
+                DataBaseHelper.SafeSqlString(stringDate));
 
                 DataBaseHelper.RunSql(sql);
                 return 0;
             }
 
             var RecieptCategoryId = 0;
-            sql = string.Format(@"EXEC [sp_SaveRecieptCategory] {0}, {1},{2},{3},{4}",
+            sql = string.Format(@"EXEC [sp_SaveRecieptCategory] {0}, {1},{2},{3},{4},{5}",
             DataBaseHelper.RawSafeSqlString(model.RecieptCategoryId),
             DataBaseHelper.SafeSqlString(model.Description),
             DataBaseHelper.RawSafeSglDecimal((decimal)model.CurrentSum),
             DataBaseHelper.RawSafeSqlString(model.RecieptId),
-            DataBaseHelper.SafeSqlString(model.IsShowUp));
+            DataBaseHelper.SafeSqlString(model.IsShowUp),
+            DataBaseHelper.SafeSqlString(stringDate));
 
             var dataResult = DataBaseHelper.GetSqlResult(sql);
             if (dataResult != null && dataResult.Rows.Count > 0)
