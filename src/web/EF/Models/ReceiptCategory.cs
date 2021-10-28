@@ -14,6 +14,6 @@ namespace web.EF.Models
         public decimal CurrentSum { get; set; }
         public int ReceiptId { get; set; }
         public bool IsShowUp { get; set; }
-        public DateTime DateOfPurchase { get; set; }
+        public DateTime DateOfIncome { get; set; }
     }
 }

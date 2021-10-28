@@ -15,5 +15,6 @@ namespace web.Data.ModelDtos
         public bool IsShowUp { get; set; }
         public decimal CurrentAllSum { get; set; }
         public DateTime CurrentDate { get; set; }
+        public DateTime DateOfPurchase { get; set; }
     }
 }

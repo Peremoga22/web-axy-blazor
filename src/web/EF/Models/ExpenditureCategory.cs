@@ -15,5 +15,6 @@ namespace web.EF.Models
         public decimal CurrentSum { get; set; }     
         public int ExpenditureId { get; set; }
         public bool IsShowUp { get; set; }
+        public DateTime DateOfPurchase { get; set; }
     }
 }

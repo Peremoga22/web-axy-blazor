@@ -33,7 +33,7 @@ namespace web.Data.Adapters
                         RecieptId = DataBaseHelper.GetIntegerValueFromRowByName(item, "ReceiptId"),
                         IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(item, "IsShowUp"),
                         CurrentDate = DataBaseHelper.GetDateTimeValueFromRowByName(item, "CurrentDate"),
-                        DateOfPurchase = DataBaseHelper.GetDateTimeValueFromRowByName(item, "DateOfPurchase")
+                        DateOfIncome = DataBaseHelper.GetDateTimeValueFromRowByName(item, "DateOfIncome")
                     });
                 }
             }
@@ -82,7 +82,7 @@ namespace web.Data.Adapters
                     IsShowUp = DataBaseHelper.GetBoolValueFromRowByName(sqlResult.Rows[0], "IsShowUp"),
                     RecieptId = DataBaseHelper.GetIntegerValueFromRowByName(sqlResult.Rows[0], "ReceiptId"),
                     CurrentSum = DataBaseHelper.GetDecimalValueFromRowByName(sqlResult.Rows[0], "CurrentSum"),
-                    DateOfPurchase = DataBaseHelper.GetDateTimeValueFromRowByName(sqlResult.Rows[0], "DateOfPurchase")
+                    DateOfIncome = DataBaseHelper.GetDateTimeValueFromRowByName(sqlResult.Rows[0], "DateOfIncome")
                 };
             }
 
@@ -92,7 +92,7 @@ namespace web.Data.Adapters
         public static int SaveRecieptCategory(RecieptCategoryDto model)
         {
             var format = "yyyy-MM-dd HH:mm:ss:fff";
-            var stringDate = model.DateOfPurchase.ToString(format);
+            var stringDate = model.DateOfIncome.ToString(format);
             var sql = string.Empty;
             if (model.RecieptCategoryId > 0)
             {

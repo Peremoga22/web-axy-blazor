@@ -162,7 +162,7 @@
                 receipt.CurrentSum = model.SumReceipt;
                 receipt.Description = model.DescriptionCategory;
                 receipt.IsShowUp = true;
-                receipt.DateOfPurchase = model.CurrentDate;
+                receipt.DateOfIncome = model.CurrentDate;
                 RecieptCategoryAdapter.SaveRecieptCategory(receipt);
 
                 model.Id = CategoryAdapter.GetCategory(userId).Where(z => z.ReceiptId == model.ReceiptId).Select(z=>z.Id).FirstOrDefault();
@@ -182,6 +182,7 @@
                 expenditure.CurrentSum = model.SumExpenditure;
                 expenditure.Description = model.DescriptionCategory;
                 expenditure.IsShowUp = true;
+                expenditure.DateOfPurchase = model.CurrentDate;
                 ExpenditureCategoryAdapter.SaveExpenditureCategory(expenditure);
 
                 model.Id = CategoryAdapter.GetCategory(userId).Where(z => z.ExpenditureId == model.ExpenditureId).Select(z => z.Id).FirstOrDefault();

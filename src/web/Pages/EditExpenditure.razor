@@ -21,7 +21,7 @@
                     <td class="text-right" style="color:red">@item.Description</td>
                     <td class="text-right">@item.CurrentSum</td>
 
-                    <td class="text-right">@item.CurrentDate.ToString("dd-MM-yyyy")</td>
+                    <td class="text-right">@item.DateOfPurchase.ToString("dd-MM-yyyy")</td>
                 }
 
                 <td class="text-center">
@@ -64,7 +64,7 @@
                             </tr>
                             <tr class="form-group">
                                 <td>@_localizer["Date time"]</td>
-                                <td><input class="form-control" type="date" @bind-value="model.CurrentDate" disabled /></td>
+                                <td><input class="form-control" type="date" @bind-value="model.DateOfPurchase" /></td>
                             </tr>
                         </table>
                     </div>
